@@ -12,7 +12,9 @@ import io.renren.common.annotation.SysLog;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.R;
+import io.renren.modules.fenhuo.service.FenhuoShiroService;
 import io.renren.modules.sys.entity.SysMenuEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.ShiroService;
 import io.renren.modules.sys.service.SysMenuService;
 import org.apache.commons.lang.StringUtils;
@@ -36,14 +38,23 @@ public class SysMenuController extends AbstractController {
 	@Autowired
 	private ShiroService shiroService;
 
+	@Autowired
+	private FenhuoShiroService fenhuoShiroService;
+
 	/**
 	 * 导航菜单
 	 */
 	@GetMapping("/nav")
 	public R nav(){
-		List<SysMenuEntity> menuList = sysMenuService.getUserMenuList(getUserId());
-		Set<String> permissions = shiroService.getUserPermissions(getUserId());
-		return R.ok().put("menuList", menuList).put("permissions", permissions);
+		if (getUser() instanceof SysUserEntity) {
+			List<SysMenuEntity> menuList = sysMenuService.getUserMenuList(getUserId());
+			Set<String> permissions = shiroService.getUserPermissions(getUserId());
+			return R.ok().put("menuList", menuList).put("permissions", permissions);
+		}else{
+			List<SysMenuEntity> menuList = sysMenuService.getFenhuoUserMenuList(getUserId());
+			Set<String> permissions = fenhuoShiroService.getFenhuoUserPermissions(getUserId());
+			return R.ok().put("menuList", menuList).put("permissions", permissions);
+		}
 	}
 	
 	/**

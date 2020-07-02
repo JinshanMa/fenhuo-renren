@@ -73,11 +73,18 @@ public class SysUserController extends AbstractController {
 	@PostMapping("/password")
 	public R password(@RequestBody PasswordForm form){
 		Assert.isBlank(form.getNewPassword(), "新密码不为能空");
-		
+		Object gettedUser = getUser();
 		//sha256加密
-		String password = new Sha256Hash(form.getPassword(), getUser().getSalt()).toHex();
-		//sha256加密
-		String newPassword = new Sha256Hash(form.getNewPassword(), getUser().getSalt()).toHex();
+		String password = null;
+		String newPassword = null;
+		if(gettedUser instanceof SysUserEntity){
+			SysUserEntity sysUserEntity = (SysUserEntity)gettedUser;
+			//sha256加密
+			password = new Sha256Hash(form.getPassword(), sysUserEntity.getSalt()).toHex();
+			//sha256加密
+			newPassword = new Sha256Hash(form.getNewPassword(), sysUserEntity.getSalt()).toHex();
+		}
+
 				
 		//更新密码
 		boolean flag = sysUserService.updatePassword(getUserId(), password, newPassword);

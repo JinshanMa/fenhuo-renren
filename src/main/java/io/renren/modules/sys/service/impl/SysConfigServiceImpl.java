@@ -24,7 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Service("sysConfigService")
@@ -100,5 +102,28 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigDao, SysConfigEnt
 		} catch (Exception e) {
 			throw new RRException("获取参数失败");
 		}
+	}
+
+	@Override
+	public List<SysConfigEntity> getConfigByKeysRange(Map<String, Object> params) {
+		String paramKeyStart = (String)params.get("start");
+		String paramKeyEnd = (String)params.get("end");
+		List<String> paramsList = new ArrayList<String>();
+		if(StringUtils.isNotBlank(paramKeyStart) && StringUtils.isNotBlank(paramKeyEnd)){
+			int startindex = Integer.parseInt(paramKeyStart);
+			int endindex = Integer.parseInt(paramKeyEnd);
+			for(int i = 0;startindex + i <= endindex; i++){
+				paramsList.add(String.valueOf(startindex + i));
+			}
+		}else{
+			return new ArrayList<SysConfigEntity>();
+		}
+
+		QueryWrapper<SysConfigEntity> wrapper = new QueryWrapper<SysConfigEntity>()
+				.and(i -> i.in("param_key", paramsList)
+						.eq("status", 1));
+//				.in("param_key", paramsList).and(true, i -> i.eq("status", 1));
+
+		return baseMapper.selectList(wrapper);
 	}
 }

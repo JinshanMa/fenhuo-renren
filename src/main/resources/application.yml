@@ -9,6 +9,9 @@ server:
   servlet:
     context-path: /renren-fast
 
+uploadfileconfig:
+  localuploadpath: /uploadfile
+
 spring:
   # 环境 dev|test|prod
   profiles:

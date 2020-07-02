@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.fenhuo.dao.FenhuoUsersDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.fenhuo.entity.FenhuoUsersEntity" id="fenhuoUsersMap">
+        <result property="userid" column="userid"/>
+        <result property="mobile" column="mobile"/>
+        <result property="loginname" column="loginname"/>
+        <result property="password" column="password"/>
+        <result property="orgid" column="orgid"/>
+        <result property="orgname" column="orgname"/>
+        <result property="pushid" column="pushid"/>
+        <result property="realname" column="realname"/>
+        <result property="roleid" column="roleid"/>
+        <result property="rolename" column="rolename"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastLogin" column="last_login"/>
+        <result property="isdelete" column="isdelete"/>
+        <result property="serviceid" column="serviceid"/>
+        <result property="companyname" column="companyname"/>
+        <result property="servicecontext" column="servicecontext"/>
+        <result property="contacts" column="contacts"/>
+        <result property="contactstel" column="contactstel"/>
+        <result property="expectsupport" column="expectsupport"/>
+        <result property="university" column="university"/>
+        <result property="experience" column="experience"/>
+        <result property="skill" column="skill"/>
+        <result property="intention" column="intention"/>
+        <result property="certificate" column="certificate"/>
+        <result property="remark" column="remark"/>
+        <result property="sex" column="sex"/>
+        <result property="provice" column="provice"/>
+        <result property="city" column="city"/>
+        <result property="area" column="area"/>
+        <result property="address" column="address"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="queryFenhuoAllPerms" resultType="string">
+        select m.perms from fenhuo_user_sys_role fur
+        LEFT JOIN sys_role_menu rm on fur.role_id = rm.role_id
+        LEFT JOIN sys_menu m on rm.menu_id = m.menu_id
+        where fur.user_id = #{userId}
+    </select>
+    <!--  烽火账户登陆账户查询  -->
+    <select id="sysOverQueryByUserName" resultType="io.renren.modules.fenhuo.entity.FenhuoUsersEntity">
+        select * from fenhuo_users where loginname = #{username}
+    </select>
+
+
+    <!-- 查询用户的所有菜单ID -->
+    <select id="queryAllMenuId" resultType="long">
+        select distinct rm.menu_id from fenhuo_user_sys_role fur
+        LEFT JOIN sys_role_menu rm on fur.role_id = rm.role_id
+        where fur.user_id = #{userId}
+    </select>
+
+</mapper>

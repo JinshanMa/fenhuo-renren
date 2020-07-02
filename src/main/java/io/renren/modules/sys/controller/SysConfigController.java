@@ -19,6 +19,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,5 +95,19 @@ public class SysConfigController extends AbstractController {
 		
 		return R.ok();
 	}
+
+
+	/**
+	 * 条件查询sysconfig的paramkey
+	 */
+	@GetMapping("/queryrange")
+	@RequiresPermissions("fenhuo:fenhuoprojectinfo:list")
+	public R fenhuoList(@RequestParam Map<String, Object> params){
+		List<SysConfigEntity> queryList = sysConfigService.getConfigByKeysRange(params);
+
+		return R.ok().put("config", queryList);
+	}
+
+
 
 }

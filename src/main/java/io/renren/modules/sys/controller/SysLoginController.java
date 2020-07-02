@@ -9,6 +9,9 @@
 package io.renren.modules.sys.controller;
 
 import io.renren.common.utils.R;
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.fenhuo.service.FenhuoUserTokenService;
+import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.form.SysLoginForm;
 import io.renren.modules.sys.service.SysCaptchaService;
@@ -43,6 +46,13 @@ public class SysLoginController extends AbstractController {
 	@Autowired
 	private SysCaptchaService sysCaptchaService;
 
+	// 处理烽火账户的服务类
+	@Autowired
+	private FenhuoUsersService fenhuoUsersService;
+
+	// 烽火token服务类
+	@Autowired
+	private FenhuoUserTokenService fenhuoUserTokenService;
 	/**
 	 * 验证码
 	 */
@@ -71,20 +81,42 @@ public class SysLoginController extends AbstractController {
 
 		//用户信息
 		SysUserEntity user = sysUserService.queryByUserName(form.getUsername());
+		///////////////////此处处理账户不是系统用户的步骤，目前挑战到烽火账户下处理
+		FenhuoUsersEntity fenhuoUsers = null;
+		if(user == null){
+			fenhuoUsers = fenhuoUsersService.sysOverQueryByUserName(form.getUsername());
 
-		//账号不存在、密码错误
-		if(user == null || !user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
-			return R.error("账号或密码不正确");
+			///////////////////此处处理账户不是系统用户的步骤---end
+			//账号不存在、密码错误
+
+			/// 添加烽火账户的检测
+			if( fenhuoUsers == null || !fenhuoUsers.getPassword().equals(new Sha256Hash(form.getPassword(), fenhuoUsers.getSalt()).toHex())) {
+				return R.error("账号或密码不正确");
+			}
+
+			//账号锁定
+			if(fenhuoUsers.getStatus() == "0"){
+				return R.error("账号已被锁定,请联系管理员");
+			}
+
+			//生成token，并保存到数据库
+			R r = fenhuoUserTokenService.createToken(fenhuoUsers.getUserid());
+			return r;
+		}else{
+			if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
+				return R.error("账号或密码不正确");
+			}
+
+			//账号锁定
+			if(user.getStatus() == 0){
+				return R.error("账号已被锁定,请联系管理员");
+			}
+
+			//生成token，并保存到数据库
+			R r = sysUserTokenService.createToken(user.getUserId());
+			return r;
 		}
 
-		//账号锁定
-		if(user.getStatus() == 0){
-			return R.error("账号已被锁定,请联系管理员");
-		}
-
-		//生成token，并保存到数据库
-		R r = sysUserTokenService.createToken(user.getUserId());
-		return r;
 	}
 
 

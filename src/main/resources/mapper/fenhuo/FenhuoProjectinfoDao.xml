@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.fenhuo.dao.FenhuoProjectinfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity" id="fenhuoProjectinfoMap">
+        <result property="projectid" column="projectid"/>
+        <result property="projectname" column="projectname"/>
+        <result property="orgname" column="orgname"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="county" column="county"/>
+        <result property="address" column="address"/>
+        <result property="projectcreatetime" column="projectcreatetime"/>
+        <result property="effectivetime" column="effectivetime"/>
+        <result property="serviceid" column="serviceid"/>
+        <result property="serviceditemetail" column="serviceditemetail"/>
+        <result property="taskid" column="taskid"/>
+        <result property="taskname" column="taskname"/>
+        <result property="servicestarttime" column="servicestarttime"/>
+        <result property="serviceendtime" column="serviceendtime"/>
+        <result property="headid" column="headid"/>
+        <result property="headname" column="headname"/>
+        <result property="headmobile" column="headmobile"/>
+        <result property="partyaid" column="partyaid"/>
+        <result property="partyaname" column="partyaname"/>
+        <result property="creater" column="creater"/>
+        <result property="auditstatus" column="auditstatus"/>
+        <result property="isdelete" column="isdelete"/>
+        <result property="fileurl" column="fileurl"/>
+        <result property="projectmemo" column="projectmemo"/>
+        <result property="log" column="log"/>
+    </resultMap>
+
+    <select id="selectProjectinfoByHeaderid" resultType="io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity">
+        select * from fenhuo_projectinfo where headid REGEXP #{exp}
+    </select>
+    <select id="selectProjectinfoByApartid" resultType="io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity">
+        select * from fenhuo_projectinfo where partyaid REGEXP #{exp}
+    </select>
+    <select id="selectProjectinfoByMaintainid" resultType="io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity">
+        select * from fenhuo_projectinfo where servicemid REGEXP #{exp}
+    </select>
+
+
+</mapper>

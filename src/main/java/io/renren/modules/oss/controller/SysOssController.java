@@ -106,7 +106,6 @@ public class SysOssController {
 		if (file.isEmpty()) {
 			throw new RRException("上传文件不能为空");
 		}
-
 		//上传文件
 		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
 		String url = OSSFactory.build().uploadSuffix(file.getBytes(), suffix);

@@ -8,6 +8,7 @@
 
 package io.renren.modules.sys.controller;
 
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
@@ -21,11 +22,20 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractController {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
-	protected SysUserEntity getUser() {
-		return (SysUserEntity) SecurityUtils.getSubject().getPrincipal();
+	protected Object getUser() {
+//		 if( instanceof SysUserEntity){
+//			 return (SysUserEntity)SecurityUtils.getSubject().getPrincipal();
+//		 }else{
+//			 return (FenhuoUsersEntity)SecurityUtils.getSubject().getPrincipal();
+//		 }
+		return SecurityUtils.getSubject().getPrincipal();
 	}
 
 	protected Long getUserId() {
-		return getUser().getUserId();
+		Object gettedUser = getUser();
+		if( gettedUser instanceof SysUserEntity)
+			return ((SysUserEntity)gettedUser).getUserId();
+		else
+			return ((FenhuoUsersEntity)gettedUser).getUserid();
 	}
 }

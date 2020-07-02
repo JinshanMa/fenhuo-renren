@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.fenhuo.dao.FenhuoFaultdefendDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity" id="fenhuoFaultdefendMap">
+        <result property="defendid" column="defendid"/>
+        <result property="faultid" column="faultid"/>
+        <result property="defenderid" column="defenderid"/>
+        <result property="defendername" column="defendername"/>
+        <result property="defenderposition" column="defenderposition"/>
+        <result property="locationtime" column="locationtime"/>
+        <result property="plan" column="plan"/>
+        <result property="defendresult" column="defendresult"/>
+        <result property="resultdesc" column="resultdesc"/>
+        <result property="createrid" column="createrid"/>
+        <result property="createtime" column="createtime"/>
+        <result property="defendstarttime" column="defendstarttime"/>
+        <result property="defendendtime" column="defendendtime"/>
+    </resultMap>
+
+
+</mapper>

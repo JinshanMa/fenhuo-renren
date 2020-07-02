@@ -12,6 +12,7 @@ package io.renren.modules.sys.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.MapUtils;
+import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.sys.dao.SysMenuDao;
 import io.renren.modules.sys.entity.SysMenuEntity;
 import io.renren.modules.sys.service.SysMenuService;
@@ -30,7 +31,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
 	private SysUserService sysUserService;
 	@Autowired
 	private SysRoleMenuService sysRoleMenuService;
-	
+
+	@Autowired
+	private FenhuoUsersService fenhuoUsersService;
 	@Override
 	public List<SysMenuEntity> queryListParentId(Long parentId, List<Long> menuIdList) {
 		List<SysMenuEntity> menuList = queryListParentId(parentId);
@@ -66,6 +69,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
 		
 		//用户菜单列表
 		List<Long> menuIdList = sysUserService.queryAllMenuId(userId);
+		return getAllMenuList(menuIdList);
+	}
+
+	@Override
+	public List<SysMenuEntity> getFenhuoUserMenuList(Long userId) {
+
+		List<Long> menuIdList = fenhuoUsersService.queryAllMenuId(userId);
+
 		return getAllMenuList(menuIdList);
 	}
 

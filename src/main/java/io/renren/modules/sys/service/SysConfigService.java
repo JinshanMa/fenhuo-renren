@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.sys.entity.SysConfigEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,5 +57,12 @@ public interface SysConfigService extends IService<SysConfigEntity> {
 	 * @param clazz  Object对象
 	 */
 	public <T> T getConfigObject(String key, Class<T> clazz);
+
+	/**
+	 * 条件查询
+	 * @param params
+	 * @return
+	 */
+	public List<SysConfigEntity> getConfigByKeysRange(Map<String, Object> params);
 	
 }

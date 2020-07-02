@@ -46,6 +46,11 @@ public interface SysMenuService extends IService<SysMenuEntity> {
 	List<SysMenuEntity> getUserMenuList(Long userId);
 
 	/**
+	 * 获取烽火用户菜单列表
+	 */
+	List<SysMenuEntity> getFenhuoUserMenuList(Long userId);
+
+	/**
 	 * 删除
 	 */
 	void delete(Long menuId);
