@@ -4,6 +4,8 @@ import io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.service.FenhuoFaultdefendService;
 import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
+import io.renren.modules.fenhuo.service.IJGPushService;
+import io.renren.modules.fenhuo.utils.JGPushUtil;
 import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.service.SysConfigService;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +36,9 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
     @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
+
+    @Autowired
+    private IJGPushService jGPushService;
 
     @Override
     public boolean savefenhuofault(FenhuoFaultEntity faultEntity) {
@@ -85,8 +90,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
             fenhuoFaultdefendService.save(fenhuoFaultdefend);
         }
-
-
+        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, null, null, null);
 
         return true;
     }

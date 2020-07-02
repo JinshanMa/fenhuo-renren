@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import io.renren.common.annotation.SysLog;
 import io.renren.common.utils.HttpContextUtils;
 import io.renren.common.utils.IPUtils;
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.sys.entity.SysLogEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysLogService;
@@ -89,12 +90,23 @@ public class SysLogAspect {
 		//设置IP地址
 		sysLog.setIp(IPUtils.getIpAddr(request));
 
-		//用户名
-		String username = ((SysUserEntity) SecurityUtils.getSubject().getPrincipal()).getUsername();
-		sysLog.setUsername(username);
+		Object userobjct = SecurityUtils.getSubject().getPrincipal();
+		if (userobjct instanceof SysUserEntity){
+			//用户名
+			String username = ((SysUserEntity)userobjct).getUsername();
+			sysLog.setUsername(username);
 
-		sysLog.setTime(time);
-		sysLog.setCreateDate(new Date());
+			sysLog.setTime(time);
+			sysLog.setCreateDate(new Date());
+		} else {
+			//用户名
+			String username = ((FenhuoUsersEntity)userobjct).getRealname();
+			sysLog.setUsername(username);
+
+			sysLog.setTime(time);
+			sysLog.setCreateDate(new Date());
+		}
+
 		//保存系统日志
 		sysLogService.save(sysLog);
 	}

@@ -2,6 +2,7 @@ package io.renren.modules.fenhuo.service.impl;
 
 import io.renren.modules.fenhuo.entity.FenhuoUserSysRoleEntity;
 import io.renren.modules.fenhuo.service.FenhuoUserSysRoleService;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysUserRoleService;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -281,6 +282,14 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
     public List<Long> queryAllMenuId(Long userId) {
 
         return baseMapper.queryAllMenuId(userId);
+    }
+
+    @Override
+    public boolean updatePassword(Long userId, String password, String newPassword) {
+        FenhuoUsersEntity userEntity = new FenhuoUsersEntity();
+        userEntity.setPassword(newPassword);
+        return this.update(userEntity,
+                new QueryWrapper<FenhuoUsersEntity>().eq("userid", userId).eq("password", password));
     }
 
 }
