@@ -3,7 +3,7 @@
 target
 
 *.DS_Store
-application-dev.yml
+*.yml
 
 # Log file
 *.log
