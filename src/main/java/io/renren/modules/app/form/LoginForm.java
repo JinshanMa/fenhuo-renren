@@ -11,6 +11,7 @@ package io.renren.modules.app.form;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import reactor.util.annotation.Nullable;
 
 import javax.validation.constraints.NotBlank;
 
@@ -30,4 +31,7 @@ public class LoginForm {
     @NotBlank(message="密码不能为空")
     private String password;
 
+    @ApiModelProperty(value = "pushId")
+    @Nullable
+    private String pushid;
 }
