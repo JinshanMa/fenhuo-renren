@@ -78,6 +78,11 @@ public class FenhuoFaultdefendEntity implements Serializable {
 	 */
 	private Date defendendtime;
 
+
+	/***
+	 * 项目id
+	 */
+	private Long projectid;
 	/**
 	 * 项目名称
 	 */

@@ -6,6 +6,7 @@ import java.util.Map;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.sys.controller.AbstractController;
+import io.renren.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,17 +67,22 @@ public class FenhuoFaultController extends AbstractController {
     @RequestMapping("/save")
     @RequiresPermissions("fenhuo:fenhuofault:save")
     public R save(@RequestBody FenhuoFaultEntity fenhuoFault){
+
         // 申报人id
         Long userid = getUserId();
-        FenhuoUsersEntity userMsg = fenhuoUsersService.getById(userid);
+        Object userObj = getUser();
         fenhuoFault.setDeclarer(String.valueOf(userid));
+        if(userObj instanceof FenhuoUsersEntity){
+//            FenhuoUsersEntity userMsg = fenhuoUsersService.getById(userid);
 
-        // 设置申报人姓名
-        fenhuoFault.setDeclarername(userMsg.getRealname());
-		fenhuoFaultService.savefenhuofault(fenhuoFault);
+            // 设置申报人姓名
+            fenhuoFault.setDeclarername(((FenhuoUsersEntity)userObj).getRealname());
 
+        }else{
+            fenhuoFault.setDeclarername(((SysUserEntity)userObj).getUsername());
+        }
 
-
+        fenhuoFaultService.savefenhuofault(fenhuoFault);
         return R.ok();
     }
 

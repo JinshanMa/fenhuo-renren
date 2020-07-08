@@ -20,12 +20,13 @@ import java.util.Map;
 
 public class JGPushUtil {
     private static Logger log = LoggerFactory.getLogger(JGPushUtil.class);
-    private static String testPushId = "47501a81bb6271c807175f1c1f9496cbca975574";
+    private static String testPushId = "140fe1da9e2616ec26c";
 
 
 
-    private static String MASTER_SECRET = "ed2d5b8baaf0765879e76286";
-    private static String APP_KEY = "b61962504d0230c809a94fb3";
+    private static String MASTER_SECRET = "da66ef1df409fb8ac4883bd4";
+//    private static String APP_KEY = "b61962504d0230c809a94fb3";
+    private static String APP_KEY = "0d0a2c0d949aed0aa51a3ca1";
 
     public static boolean pushMsgByRegID(String registerId,String title,String content, Map<String,String> extras){
 
