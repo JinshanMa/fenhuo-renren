@@ -91,4 +91,9 @@ public class FenhuoFaultdefendEntity implements Serializable {
 
 	private String faultdesc;
 
+	/**
+	 * 是否删除标志位
+	 */
+	private int isdelete;
+
 }

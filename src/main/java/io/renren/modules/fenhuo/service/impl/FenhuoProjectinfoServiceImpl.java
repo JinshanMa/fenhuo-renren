@@ -41,11 +41,17 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         IPage<FenhuoProjectinfoEntity> page = this.page(
                 new Query<FenhuoProjectinfoEntity>().getPage(params),
                 new QueryWrapper<FenhuoProjectinfoEntity>().eq("isdelete", 0)
-                .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.like("headid", (String)params.get("headid")))
-                .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.like("partyaid",(String)params.get("partyaid")))
-                .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.like("servicemid",(String)params.get("servicemid")))
+                .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))))
+                        .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))))
+                        .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))))
+
         );
         return new PageUtils(page);
+    }
+    private String getREPXEPContent(String userID){
+        String tempContent = "(^"+ userID +",)|(,"+userID+",)|(,"+userID+"$)";
+
+        return "\""+tempContent+"\"";
     }
 
     @Override
