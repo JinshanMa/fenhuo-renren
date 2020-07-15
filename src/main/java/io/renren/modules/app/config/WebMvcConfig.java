@@ -43,13 +43,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
 
-    //图片保存路径
-    public static final String PIC_PATH = "/profile/";
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         /** 图片传路径 */
-        registry.addResourceHandler("/uploadfile/**").addResourceLocations("file:" + UploadFileConfig.getLocaluploadpath());
+        registry.addResourceHandler("/uploadfile/**").addResourceLocations("file:" + new UploadFileConfig().getLocaluploadpath());
 
     }
 

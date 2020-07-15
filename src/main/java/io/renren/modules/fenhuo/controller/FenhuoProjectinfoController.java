@@ -2,14 +2,12 @@ package io.renren.modules.fenhuo.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.renren.config.UploadFileConfig;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.entity.FenhuoZabbixhostEntity;
 import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
@@ -20,6 +18,7 @@ import io.renren.modules.sys.entity.SysUserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
@@ -47,6 +46,9 @@ public class FenhuoProjectinfoController extends AbstractController {
 
     @Autowired
     private ZabbixApiUtils zabbixApiUtils;
+
+    @Autowired
+    private UploadFileConfig uploadFileConfig;
     /**
      * 列表
      */
@@ -157,7 +159,7 @@ public class FenhuoProjectinfoController extends AbstractController {
 
             fenhuoZabbixhostService.save(fenhuoZabbixhost);
         }
-		return R.ok();
+		return R.ok().put("projectid", fenhuoProjectinfo.getProjectid());
 //        return R.ok("projectid", fenhuoProjectinfo.getProjectid());
     }
 
@@ -229,29 +231,61 @@ public class FenhuoProjectinfoController extends AbstractController {
 
 
 
-    @PostMapping("/upload")
+    @PostMapping("/upload/{projectid}")
     @RequiresPermissions("fenhuo:user:batch:add")
-    public R uploadRelatedFile(@RequestParam("file") MultipartFile file){
+    public R uploadRelatedFile(@PathVariable("projectid") String projectid, @RequestParam("files") MultipartFile[] files){
 
-        if (file.isEmpty()) {
-            return R.error("filename is empty");
-        }
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                return R.error("filename is empty");
+            }
 
-        String fileName = file.getOriginalFilename();
-        System.out.println("fileName----:" + fileName);
-        String filePath = "/temp/";
-        File dest = new File(filePath + fileName);
 
-        try {
-            file.transferTo(dest);
+            String fileName = file.getOriginalFilename();
+
+            String destPath = uploadFileConfig.getLocaluploadpath();
+            System.out.println("---------projectid: " + projectid + "-----UploadFileConfig.getLocaluploadpath():" + uploadFileConfig.getLocaluploadpath());
+
+            FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
+            String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
+
+            File projectUploadFileDir = new File(projectFileDir);
+            if (!projectUploadFileDir.exists()) {
+                boolean ok = projectUploadFileDir.mkdir();
+                if (!ok) {
+                    return R.error().put("msg", "project Upload directory can not create!");
+                }
+            }
+
+            File dest = new File(projectFileDir + fileName);
+            try {
+                file.transferTo(dest);
+                String fullpath = dest.getAbsolutePath();
+                String orinalUrls = projectinfo.getFileurl();
+                List<String> urls;
+                if (StringUtils.isNotBlank(orinalUrls)) {
+                    List<String> arrayList = Arrays.asList(orinalUrls.split(":"));
+                    urls = new ArrayList(arrayList);
+                    System.out.println("---isNotBlank---:" + urls);
+                } else {
+                    urls = new ArrayList<String>();
+                    System.out.println("---isBlank---");
+                }
+                System.out.println("before finalfullpath++++++++----:" + String.join(":", urls));
+                urls.add(fullpath);
+                String finalFullPath = String.join(":", urls);
+                System.out.println("after finalfullpath++++++++------:" + finalFullPath);
+                projectinfo.setFileurl(finalFullPath);
+                fenhuoProjectinfoService.updateById(projectinfo);
 //            LOGGER.info("上传成功");
-            return R.ok();
-        } catch (IOException e) {
-            e.printStackTrace();
-//            LOGGER.error(e.toString(), e);
-        }
 
+            } catch (IOException e) {
+                e.printStackTrace();
+//            LOGGER.error(e.toString(), e);
+            }
+        }
         return R.ok();
+
     }
 
 }

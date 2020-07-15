@@ -4,8 +4,9 @@ import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
 import io.renren.modules.sys.entity.SysConfigEntity;
-import io.renren.modules.sys.service.SysCaptchaService;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysConfigService;
+import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,9 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
     @Autowired
     private FenhuoUsersService fenhuoUsersService;
+
+    @Autowired
+    private SysUserService sysUserService;
 
     @Autowired
     private FenhuoZabbixhostService fenhuoZabbixhostService;
@@ -175,19 +179,40 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
                 .eq(StringUtils.isNotBlank(queryKey),"param_key", queryKey);
         return sysConfigService.getOne(serviceMsgConfigWrapper);
     }
-    private List<FenhuoUsersEntity> getUsersMsg(String userids){
+    private List<? extends Serializable> getUsersMsg(String userids){
         String[] useridArray = userids.split(",");
+
         QueryWrapper<FenhuoUsersEntity> fenhuoUserWrapper = new QueryWrapper<FenhuoUsersEntity>()
                 .in(useridArray.length > 0,"userid", useridArray);
-        return fenhuoUsersService.list(fenhuoUserWrapper);
-    }
-    private String convertToStringName(List<FenhuoUsersEntity> users){
-        StringBuilder sb = new StringBuilder();
-        for(FenhuoUsersEntity usersEntity : users){
-            sb.append(usersEntity.getRealname());
-            sb.append(",");
+        List<FenhuoUsersEntity> fenhuoList = fenhuoUsersService.list(fenhuoUserWrapper);
+
+
+        if(fenhuoList.size() <= 0){
+            QueryWrapper<SysUserEntity> sysUserWrapper = new QueryWrapper<SysUserEntity>()
+                    .in(useridArray.length > 0,"user_id", useridArray);
+            return  sysUserService.list(sysUserWrapper);
         }
-        sb.deleteCharAt(sb.length()-1);
+        return fenhuoList;
+    }
+    private String convertToStringName(List<? extends Serializable> users){
+        StringBuilder sb = new StringBuilder();
+
+        if (users.size() > 0 && users.get(0) instanceof FenhuoUsersEntity){
+            List<FenhuoUsersEntity> fenhuoUsers = (List<FenhuoUsersEntity>)users;
+            for(FenhuoUsersEntity usersEntity : fenhuoUsers){
+                sb.append(usersEntity.getRealname());
+                sb.append(",");
+            }
+        }else if(users.size() > 0){
+            List<SysUserEntity> sysUsers = (List<SysUserEntity>)users;
+            for(SysUserEntity usersEntity : sysUsers){
+                sb.append(usersEntity.getUsername());
+                sb.append(",");
+            }
+        }
+        if(users.size() > 0) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
         return sb.toString();
     }
 }
