@@ -4,6 +4,8 @@ import io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.service.FenhuoFaultdefendService;
 import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
+import io.renren.modules.fenhuo.service.IJGPushService;
+import io.renren.modules.fenhuo.utils.JGPushUtil;
 import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.service.SysConfigService;
 import org.apache.commons.lang.StringUtils;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -35,6 +38,9 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
 
+    @Autowired
+    private IJGPushService jGPushService;
+
     @Override
     public boolean savefenhuofault(FenhuoFaultEntity faultEntity) {
 
@@ -53,9 +59,12 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
 
         String faultdesc = faultEntity.getFaultdesc();
+
+        String projectid = faultEntity.getProjectid();
         // 获得项目的维护人ids
         QueryWrapper<FenhuoProjectinfoEntity> proinfoWrapper = new QueryWrapper<FenhuoProjectinfoEntity>()
-                .eq("projectid", faultEntity.getProjectid());
+                .eq("projectid", projectid);
+
         FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getOne(proinfoWrapper);
         String mids = projectinfo.getServicemid();
         String names = projectinfo.getServicemname();
@@ -66,6 +75,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         for(int i = 0;i < maintainids.length ;i++){
             FenhuoFaultdefendEntity fenhuoFaultdefend = new FenhuoFaultdefendEntity();
 
+            fenhuoFaultdefend.setProjectid(Long.valueOf(projectid));
             fenhuoFaultdefend.setFaultid(faultEntity.getFaultid());
 
             // 维护人id 和 姓名
@@ -79,14 +89,25 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
             fenhuoFaultdefend.setCreaterid(faultEntity.getDeclarer());
             fenhuoFaultdefend.setCreatername(faultEntity.getDeclarername());
 
-            fenhuoFaultdefend.setCreatetime(new Date());
+            Date iniDate = new Date();
+            fenhuoFaultdefend.setCreatetime(iniDate);
+
+            // 初始化维修时间和创建时间一样，前端判断如果和创建时间一样，则显示“维护未开始”
+            //
+            fenhuoFaultdefend.setDefendstarttime(iniDate);
+            fenhuoFaultdefend.setDefendendtime(iniDate);
+
             fenhuoFaultdefend.setProjectname(projectname);
             fenhuoFaultdefend.setFaultdesc(faultdesc);
 
             fenhuoFaultdefendService.save(fenhuoFaultdefend);
         }
-
-
+        Map<String,String> extras = new HashMap<>();
+        extras.put("content",faultdesc);
+        extras.put("projectId",projectid);
+        extras.put("projectName",projectname);
+        extras.put("msgType","extra-msgType");
+        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, extras, null, null);
 
         return true;
     }

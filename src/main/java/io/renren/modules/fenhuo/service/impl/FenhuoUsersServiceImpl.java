@@ -1,7 +1,11 @@
 package io.renren.modules.fenhuo.service.impl;
 
+import io.renren.common.exception.RRException;
+import io.renren.common.validator.Assert;
+import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.fenhuo.entity.FenhuoUserSysRoleEntity;
 import io.renren.modules.fenhuo.service.FenhuoUserSysRoleService;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysUserRoleService;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +40,32 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
     @Autowired
     private FenhuoUserSysRoleService fenhuoUserSysRoleService;
 
+    @Override
+    public FenhuoUsersEntity queryByMobile(String mobile) {
+        return baseMapper.selectOne(new QueryWrapper<FenhuoUsersEntity>().eq("mobile", mobile));
+    }
+
+    @Override
+    public FenhuoUsersEntity login(LoginForm form) {
+        FenhuoUsersEntity user = queryByMobile(form.getMobile());
+        Assert.isNull(user, "手机号或密码错误");
+
+        //密码错误
+        String pwd = new Sha256Hash(form.getPassword(), user.getSalt()).toHex();
+        if (!user.getPassword().equals(pwd)){
+            throw new RRException("手机号或密码错误");
+        }
+
+        user.setPushid(form.getPushid());
+
+        save(user);
+
+//        if(!user.getPassword().equals(DigestUtils.sha256Hex(form.getPassword()))){
+//            throw new RRException("手机号或密码错误");
+//        }
+
+        return user;
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -281,6 +311,14 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
     public List<Long> queryAllMenuId(Long userId) {
 
         return baseMapper.queryAllMenuId(userId);
+    }
+
+    @Override
+    public boolean updatePassword(Long userId, String password, String newPassword) {
+        FenhuoUsersEntity userEntity = new FenhuoUsersEntity();
+        userEntity.setPassword(newPassword);
+        return this.update(userEntity,
+                new QueryWrapper<FenhuoUsersEntity>().eq("userid", userId).eq("password", password));
     }
 
 }

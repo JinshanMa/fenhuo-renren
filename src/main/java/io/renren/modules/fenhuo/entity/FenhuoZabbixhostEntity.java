@@ -44,6 +44,11 @@ public class FenhuoZabbixhostEntity implements Serializable {
 	 * 
 	 */
 	private String hostip;
+
+	/**
+	 * 主机的操作系统名称
+	 */
+	private String os;
 	/**
 	 * zabbixhost 链接
 	 */

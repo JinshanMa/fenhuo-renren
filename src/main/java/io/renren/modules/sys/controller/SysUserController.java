@@ -16,6 +16,8 @@ import io.renren.common.validator.Assert;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.UpdateGroup;
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.form.PasswordForm;
 import io.renren.modules.sys.service.SysUserRoleService;
@@ -39,6 +41,10 @@ import java.util.Map;
 public class SysUserController extends AbstractController {
 	@Autowired
 	private SysUserService sysUserService;
+
+	@Autowired
+	private FenhuoUsersService fenhuoUsersService;
+
 	@Autowired
 	private SysUserRoleService sysUserRoleService;
 
@@ -83,14 +89,27 @@ public class SysUserController extends AbstractController {
 			password = new Sha256Hash(form.getPassword(), sysUserEntity.getSalt()).toHex();
 			//sha256加密
 			newPassword = new Sha256Hash(form.getNewPassword(), sysUserEntity.getSalt()).toHex();
+
+			//更新密码
+			boolean flag = sysUserService.updatePassword(getUserId(), password, newPassword);
+			if(!flag){
+				return R.error("原密码不正确");
+			}
+		} else {
+			FenhuoUsersEntity fenhuoUserEntity = (FenhuoUsersEntity)gettedUser;
+			//sha256加密
+			password = new Sha256Hash(form.getPassword(), fenhuoUserEntity.getSalt()).toHex();
+			//sha256加密
+			newPassword = new Sha256Hash(form.getNewPassword(), fenhuoUserEntity.getSalt()).toHex();
+			//更新密码
+			boolean flag = fenhuoUsersService.updatePassword(getUserId(), password, newPassword);
+			if(!flag){
+				return R.error("原密码不正确");
+			}
 		}
 
 				
-		//更新密码
-		boolean flag = sysUserService.updatePassword(getUserId(), password, newPassword);
-		if(!flag){
-			return R.error("原密码不正确");
-		}
+
 		
 		return R.ok();
 	}

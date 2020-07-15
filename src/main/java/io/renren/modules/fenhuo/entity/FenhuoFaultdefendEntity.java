@@ -78,6 +78,11 @@ public class FenhuoFaultdefendEntity implements Serializable {
 	 */
 	private Date defendendtime;
 
+
+	/***
+	 * 项目id
+	 */
+	private Long projectid;
 	/**
 	 * 项目名称
 	 */
@@ -85,5 +90,10 @@ public class FenhuoFaultdefendEntity implements Serializable {
 
 
 	private String faultdesc;
+
+	/**
+	 * 是否删除标志位
+	 */
+	private int isdelete;
 
 }

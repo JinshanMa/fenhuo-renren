@@ -14,9 +14,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service("jGPushService")
 public class JGPushServiceImpl implements IJGPushService {
     private static Logger logger = LoggerFactory.getLogger(JGPushServiceImpl.class);
     @Autowired
@@ -112,7 +114,7 @@ public class JGPushServiceImpl implements IJGPushService {
                 return false;
             }
             for (FenhuoUsersEntity user : users){
-                if (!StringUtils.isNotBlank(user.getPushid())) {
+                if (StringUtils.isNotBlank(user.getPushid())) {
                     logger.info("给维护人员推送通知，推送ID："+user.getPushid());
                     boolean b = JGPushUtil.pushMsgByRegID(user.getPushid(), title, content, extras);
                     if (b){

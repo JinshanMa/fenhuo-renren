@@ -3,6 +3,8 @@ package io.renren.modules.fenhuo.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.sys.controller.AbstractController;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +29,7 @@ import io.renren.common.utils.R;
  */
 @RestController
 @RequestMapping("fenhuo/fenhuofaultdefend")
-public class FenhuoFaultdefendController {
+public class FenhuoFaultdefendController extends AbstractController {
     @Autowired
     private FenhuoFaultdefendService fenhuoFaultdefendService;
 
@@ -37,8 +39,13 @@ public class FenhuoFaultdefendController {
     @RequestMapping("/list")
     @RequiresPermissions("fenhuo:fenhuofaultdefend:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = fenhuoFaultdefendService.queryPage(params);
-
+        PageUtils page;
+        if(getUser() instanceof FenhuoUsersEntity){
+            params.put("headid", String.valueOf(getUserId()));
+            page = fenhuoFaultdefendService.queryPage(params);
+        }else {
+            page = fenhuoFaultdefendService.queryPage(params);
+        }
         return R.ok().put("page", page);
     }
 

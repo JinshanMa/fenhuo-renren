@@ -9,11 +9,12 @@
 package io.renren.modules.app.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.common.utils.R;
 import io.renren.common.validator.ValidatorUtils;
-import io.renren.modules.app.entity.UserEntity;
 import io.renren.modules.app.form.RegisterForm;
-import io.renren.modules.app.service.UserService;
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -35,7 +36,7 @@ import java.util.Date;
 @Api("APP注册接口")
 public class AppRegisterController {
     @Autowired
-    private UserService userService;
+    private FenhuoUsersService fenhuoUsersService;
 
     @PostMapping("register")
     @ApiOperation("注册")
@@ -43,12 +44,36 @@ public class AppRegisterController {
         //表单校验
         ValidatorUtils.validateEntity(form);
 
-        UserEntity user = new UserEntity();
+        QueryWrapper<FenhuoUsersEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("mobile", form.getMobile());
+        FenhuoUsersEntity hasUser = fenhuoUsersService.getOne(queryWrapper);
+        if (hasUser != null){
+            return R.error(500,"号码已注册");
+        }
+        FenhuoUsersEntity user = new FenhuoUsersEntity();
         user.setMobile(form.getMobile());
-        user.setUsername(form.getMobile());
+        user.setRoleid(form.getRoleid());
+        user.setRealname(form.getRealname());
         user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
         user.setCreateTime(new Date());
-        userService.save(user);
+        user.setLoginname(form.getMobile());
+        user.setArea(form.getArea());
+        user.setAddress(form.getAddress());
+        user.setOrgname(form.getOrgname());
+        user.setProvice(form.getProvice());
+        user.setCity(form.getCity());
+        user.setIntention(form.getIntention());
+        user.setCompanyname(form.getCompanyname());
+        user.setContacts(form.getContactstel());
+        user.setContactstel(form.getContactstel());
+        user.setSex(form.getSex());
+        user.setSkill(form.getSkill());
+        user.setRemark(form.getRemark());
+        user.setUniversity(form.getUniversity());
+        user.setExperience(form.getExperience());
+
+
+        fenhuoUsersService.saveFenhuoUser(user);
 
         return R.ok();
     }

@@ -2,6 +2,7 @@ package io.renren.modules.fenhuo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,5 +40,16 @@ public interface FenhuoUsersService extends IService<FenhuoUsersEntity> {
      * 查询用户的所有菜单ID
      */
     List<Long> queryAllMenuId(Long userId);
+
+    boolean updatePassword(Long userId, String password, String newPassword);
+
+    FenhuoUsersEntity queryByMobile(String mobile);
+
+    /**
+     * 用户登录
+     * @param form    登录表单
+     * @return        返回用户ID
+     */
+    FenhuoUsersEntity login(LoginForm form);
 }
 
