@@ -106,4 +106,7 @@ public class FenhuoFaultEntity implements Serializable {
 	 */
 	private String declartype;
 
+
+	private int isdelete;
+
 }

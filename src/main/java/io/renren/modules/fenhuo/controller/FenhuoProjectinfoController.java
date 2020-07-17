@@ -1,7 +1,6 @@
 package io.renren.modules.fenhuo.controller;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
@@ -12,12 +11,15 @@ import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.entity.FenhuoZabbixhostEntity;
 import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
+import io.renren.modules.fenhuo.utils.OpUtils;
+import io.renren.modules.fenhuo.utils.ProjectRelatedfileObj;
 import io.renren.modules.fenhuo.utils.ZabbixApiUtils;
 import io.renren.modules.sys.controller.AbstractController;
 import io.renren.modules.sys.entity.SysUserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,9 @@ import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -84,6 +89,41 @@ public class FenhuoProjectinfoController extends AbstractController {
 
         return R.ok().put("page", page);
     }
+    /**
+     * 列表
+     */
+    @RequestMapping("/seletedlist")
+    @RequiresPermissions("fenhuo:fenhuoprojectinfo:list")
+    public R seletedList(@RequestParam Map<String, Object> params){
+
+        Object userObj = getUser();
+        String fenhuouserId;
+        FenhuoUsersEntity fenhuouser = null;
+        if (userObj instanceof SysUserEntity){
+            SysUserEntity sysuser = (SysUserEntity)userObj;
+            fenhuouserId = String.valueOf(-sysuser.getUserId());
+        } else {
+            fenhuouser = (FenhuoUsersEntity)userObj;
+            fenhuouserId = String.valueOf(fenhuouser.getUserid());
+        }
+        Long longuserid = Long.valueOf(fenhuouserId);
+        if(longuserid > 0) {
+            String roleid = fenhuouser.getRoleid();
+            if(roleid.equals("2")){
+                //项目负责人
+                params.put("headid", fenhuouserId);
+            }else if(roleid.equals("1")){
+                //甲方负责人
+                params.put("partyaid", fenhuouserId);
+            }else if(roleid.equals("3")){
+                //维护工程师
+                params.put("servicemid", fenhuouserId);
+            }
+        }
+        PageUtils page = fenhuoProjectinfoService.querySelectedPage(params);
+
+        return R.ok().put("page", page);
+    }
 
 
     /**
@@ -100,6 +140,8 @@ public class FenhuoProjectinfoController extends AbstractController {
 
         return R.ok().put("projectinfo", fenhuoProjectinfo).put("zabbixhost", zbxhostList);
     }
+
+
 
     @RequestMapping("/zbx/{projectid}/{itemname}")
     @RequiresPermissions("fenhuo:fenhuoprojectinfo:info")
@@ -182,7 +224,7 @@ public class FenhuoProjectinfoController extends AbstractController {
 
             fenhuoZabbixhostService.updateById(fenhuoZabbixhost);
         }
-        return R.ok();
+        return R.ok().put("projectid", fenhuoProjectinfo.getProjectid());
     }
 
     /**
@@ -232,9 +274,34 @@ public class FenhuoProjectinfoController extends AbstractController {
 
 
     @PostMapping("/upload/{projectid}")
-    @RequiresPermissions("fenhuo:user:batch:add")
-    public R uploadRelatedFile(@PathVariable("projectid") String projectid, @RequestParam("files") MultipartFile[] files){
+    @RequiresPermissions("fenhuo:proj:upload")
+    public R uploadRelatedFile(@PathVariable("projectid") String projectid,
+                               @RequestParam("deleteFiles") String[] delFilenames,
+                               @RequestParam("files") MultipartFile[] files){
+//        System.out.println("delFilenames.length:" + delFilenames.length);
+        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
+        String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + OpUtils.getBacklash();
 
+        // 如果 待删除的文件长度等于零表示有文件需要删除
+        if (delFilenames.length > 0){
+            List<String> totalpaths = new ArrayList<String>(Arrays.asList(projectinfo.getFileurl().split(OpUtils.getSplitNotation())));
+            for (String deletingFilename: delFilenames){
+                String absolutefilepath = projectFileDir + deletingFilename;
+                File file = new File(absolutefilepath);
+                if(file.exists()){
+                    file.delete();
+                }
+                for (String path: totalpaths){
+                    if (path.equals(absolutefilepath)){
+                        totalpaths.remove(path);
+                        break;
+                    }
+                }
+            }
+            projectinfo.setFileurl(String.join(OpUtils.getSplitNotation(),totalpaths));
+            fenhuoProjectinfoService.updateById(projectinfo);
+
+        }
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
                 return R.error("filename is empty");
@@ -246,8 +313,8 @@ public class FenhuoProjectinfoController extends AbstractController {
             String destPath = uploadFileConfig.getLocaluploadpath();
             System.out.println("---------projectid: " + projectid + "-----UploadFileConfig.getLocaluploadpath():" + uploadFileConfig.getLocaluploadpath());
 
-            FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
-            String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
+//            FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
+//            String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
 
             File projectUploadFileDir = new File(projectFileDir);
             if (!projectUploadFileDir.exists()) {
@@ -264,16 +331,16 @@ public class FenhuoProjectinfoController extends AbstractController {
                 String orinalUrls = projectinfo.getFileurl();
                 List<String> urls;
                 if (StringUtils.isNotBlank(orinalUrls)) {
-                    List<String> arrayList = Arrays.asList(orinalUrls.split(":"));
+                    List<String> arrayList = Arrays.asList(orinalUrls.split(OpUtils.getSplitNotation()));
                     urls = new ArrayList(arrayList);
                     System.out.println("---isNotBlank---:" + urls);
                 } else {
                     urls = new ArrayList<String>();
                     System.out.println("---isBlank---");
                 }
-                System.out.println("before finalfullpath++++++++----:" + String.join(":", urls));
+                System.out.println("before finalfullpath++++++++----:" + String.join(OpUtils.getSplitNotation(), urls));
                 urls.add(fullpath);
-                String finalFullPath = String.join(":", urls);
+                String finalFullPath = String.join(OpUtils.getSplitNotation(), urls);
                 System.out.println("after finalfullpath++++++++------:" + finalFullPath);
                 projectinfo.setFileurl(finalFullPath);
                 fenhuoProjectinfoService.updateById(projectinfo);
@@ -285,6 +352,37 @@ public class FenhuoProjectinfoController extends AbstractController {
             }
         }
         return R.ok();
+
+    }
+
+    @GetMapping("/download")
+    @RequiresPermissions("fenhuo:proj:relatedfile:download")
+    public void downloadFile(HttpServletRequest request,HttpServletResponse res) {
+
+        fenhuoProjectinfoService.relatedFileDownload(request, res);
+
+    }
+
+    @RequestMapping("/projectfilelist/{projectid}")
+    @RequiresPermissions("fenhuo:fenhuoprojectinfo:projectfilelist")
+    public R listProjectfile(@PathVariable("projectid") String projectid){
+        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
+        String fileurls = projectinfo.getFileurl();
+        List<ProjectRelatedfileObj> filenames = new ArrayList<ProjectRelatedfileObj>();
+        if(StringUtils.isNotBlank(fileurls)) {
+            String[] files = fileurls.split(OpUtils.getSplitNotation());
+            List<String> filelist = new ArrayList<String>(Arrays.asList(files));
+
+            for (String file : filelist) {
+                int index = file.lastIndexOf(OpUtils.getBacklash());
+                ProjectRelatedfileObj fileobj = new ProjectRelatedfileObj();
+                fileobj.setUid(String.valueOf(file.hashCode()));
+                fileobj.setName(file.substring(index+1));
+                filenames.add(fileobj);
+            }
+        }
+
+        return R.ok().put("relatedfilelist", filenames);
 
     }
 

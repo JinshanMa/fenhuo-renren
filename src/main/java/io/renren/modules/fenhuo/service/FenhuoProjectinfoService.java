@@ -5,6 +5,8 @@ import io.renren.common.utils.PageUtils;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +22,8 @@ import java.util.Map;
 public interface FenhuoProjectinfoService extends IService<FenhuoProjectinfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils querySelectedPage(Map<String, Object> params);
 
     boolean saveProjectInfo(FenhuoProjectinfoEntity projectinfo);
 
@@ -38,5 +42,7 @@ public interface FenhuoProjectinfoService extends IService<FenhuoProjectinfoEnti
     List<FenhuoProjectinfoEntity> getProjectinfoByApartid(String exp);
 
     List<FenhuoProjectinfoEntity> getProjectinfoByMaintainid(String exp);
+
+    void relatedFileDownload(HttpServletRequest request, HttpServletResponse res);
 }
 

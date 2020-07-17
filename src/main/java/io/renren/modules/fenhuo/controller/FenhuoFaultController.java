@@ -44,6 +44,31 @@ public class FenhuoFaultController extends AbstractController {
     @RequestMapping("/list")
     @RequiresPermissions("fenhuo:fenhuofault:list")
     public R list(@RequestParam Map<String, Object> params){
+
+        Object userObj = getUser();
+        String fenhuouserId;
+        FenhuoUsersEntity fenhuouser = null;
+        if (userObj instanceof SysUserEntity){
+            SysUserEntity sysuser = (SysUserEntity)userObj;
+            fenhuouserId = String.valueOf(-sysuser.getUserId());
+        } else {
+            fenhuouser = (FenhuoUsersEntity)userObj;
+            fenhuouserId = String.valueOf(fenhuouser.getUserid());
+        }
+        Long longuserid = Long.valueOf(fenhuouserId);
+        if(longuserid > 0) {
+            String roleid = fenhuouser.getRoleid();
+            if(roleid.equals("2")){
+                //项目负责人
+                params.put("headid", fenhuouserId);
+            }else if(roleid.equals("1")){
+                //甲方负责人
+                params.put("partyaid", fenhuouserId);
+            }else if(roleid.equals("3")){
+                //维护工程师
+                params.put("servicemid", fenhuouserId);
+            }
+        }
         PageUtils page = fenhuoFaultService.queryPage(params);
 
         return R.ok().put("page", page);

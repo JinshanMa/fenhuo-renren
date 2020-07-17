@@ -3,6 +3,7 @@ package io.renren.modules.fenhuo.controller;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import io.renren.common.exception.RRException;
@@ -56,6 +57,13 @@ public class FenhuoUsersController extends AbstractController {
         return R.ok().put("page", page);
     }
 
+    @PostMapping("/projectlist/{projectid}")
+    @RequiresPermissions("fenhuo:fenhuoprojectinfo:list")
+    public R projectUserlist(@PathVariable("projectid") String projectid, @RequestParam Map<String, Object> params){
+
+        List<FenhuoUsersEntity> fenhuoUsers = fenhuoUsersService.queryProjectUserinfo(projectid, params);
+        return R.ok().put("userlist", fenhuoUsers);
+    }
 
     /**
      * 信息

@@ -51,5 +51,7 @@ public interface FenhuoUsersService extends IService<FenhuoUsersEntity> {
      * @return        返回用户ID
      */
     FenhuoUsersEntity login(LoginForm form);
+
+    List<FenhuoUsersEntity> queryProjectUserinfo(String projectid, Map<String, Object> params);
 }
 

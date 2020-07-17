@@ -148,15 +148,15 @@ public class ZabbixApiUtils {
 
 
 
-    public static void main2(String[] args){
+    public static void main(String[] args){
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
         boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
 
 
-//        JSONArray resarray = zabbixApiUtils.zbxApiItemGet("system.cpu.util[,user]", new String[]{"10264"});
-        JSONArray resarray = zabbixApiUtils.zbxApiUsage("hddusage",new String[]{"10264"}, new String[]{"江民测试服"});
+        JSONArray resarray = zabbixApiUtils.zbxApiItemGet("system.cpu.util[,user]", new String[]{"10264"});
+//        JSONArray resarray = zabbixApiUtils.zbxApiUsage("hddusage",new String[]{"10264"}, new String[]{"江民测试服"});
 
 
         String historyprettyjson = JSON.toJSONString(resarray, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
@@ -192,7 +192,7 @@ public class ZabbixApiUtils {
 
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
