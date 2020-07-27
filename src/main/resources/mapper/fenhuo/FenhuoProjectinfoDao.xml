@@ -31,6 +31,8 @@
         <result property="fileurl" column="fileurl"/>
         <result property="projectmemo" column="projectmemo"/>
         <result property="log" column="log"/>
+        <result property="oldheadid" column="oldheadid"/>
+        <result property="oldheadname" column="oldheadname"/>
     </resultMap>
 
     <select id="selectProjectinfoByHeaderid" resultType="io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity">

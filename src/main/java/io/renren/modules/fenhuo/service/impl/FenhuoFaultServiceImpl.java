@@ -90,7 +90,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
             fenhuoFaultdefendService.save(fenhuoFaultdefend);
         }
-        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, null, null, null);
+        //jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, null, null, null);
 
         return true;
     }

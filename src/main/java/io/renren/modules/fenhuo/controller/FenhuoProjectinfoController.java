@@ -2,10 +2,7 @@ package io.renren.modules.fenhuo.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -13,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.entity.FenhuoZabbixhostEntity;
 import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
+import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
 import io.renren.modules.fenhuo.utils.ZabbixApiUtils;
 import io.renren.modules.sys.controller.AbstractController;
@@ -39,6 +37,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("fenhuo/fenhuoprojectinfo")
 public class FenhuoProjectinfoController extends AbstractController {
+
+    @Autowired
+    private FenhuoUsersService fenhuoUsersService;
+
     @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
 

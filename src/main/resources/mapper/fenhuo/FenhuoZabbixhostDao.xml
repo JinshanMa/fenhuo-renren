@@ -8,8 +8,8 @@
         <result property="id" column="id"/>
         <result property="projectid" column="projectid"/>
         <result property="projectname" column="projectname"/>
-        <result property="hostid" column="hostid"/>
-        <result property="zabbixhostname" column="zabbixhostname"/>
+        <result property="hostids" column="hostids"/>
+        <result property="zabbixhostnames" column="zabbixhostnames"/>
         <result property="hostip" column="hostip"/>
         <result property="zbip" column="zbip"/>
         <result property="zbusername" column="zbusername"/>
