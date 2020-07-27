@@ -114,7 +114,7 @@ public class JGPushServiceImpl implements IJGPushService {
                 return false;
             }
             for (FenhuoUsersEntity user : users){
-                if (!StringUtils.isNotBlank(user.getPushid())) {
+                if (StringUtils.isNotBlank(user.getPushid())) {
                     logger.info("给维护人员推送通知，推送ID："+user.getPushid());
                     boolean b = JGPushUtil.pushMsgByRegID(user.getPushid(), title, content, extras);
                     if (b){

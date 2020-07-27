@@ -22,6 +22,8 @@ public class ZabbixApiUtils {
     private final String MEM_USAGE_KEY = "vm.memory.size[pused]";
     private final String HDD_USAGE_KEY = "vfs.fs.size[/,pused]";
     private final String NET_TOTAL_USAGE_KEY = "net.if.total";
+    private final String WINDOWS_CPU_LOAD_KEY = "system.cpu.load[percpu,avg1]";
+
     private final String NET_IN_USAGE_KEY = "net.if.in";
     private final String NET_OUT_USAGE_KEY = "net.if.out";
 
@@ -95,6 +97,9 @@ public class ZabbixApiUtils {
         switch (itemname) {
             case "cpusage":
                 resarray = zbxApiItemGet(CPU_USAGE_KEY, hostids);
+                if (resarray.size() <= 0){
+                    resarray = zbxApiItemGet(WINDOWS_CPU_LOAD_KEY, hostids);
+                }
                 break;
             case "memusage":
                 resarray = zbxApiItemGet(MEM_USAGE_KEY, hostids);
@@ -143,15 +148,15 @@ public class ZabbixApiUtils {
 
 
 
-    public static void main2(String[] args){
+    public static void main(String[] args){
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
         boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
 
 
-//        JSONArray resarray = zabbixApiUtils.zbxApiItemGet("system.cpu.util[,user]", new String[]{"10264"});
-        JSONArray resarray = zabbixApiUtils.zbxApiUsage("hddusage",new String[]{"10264"}, new String[]{"江民测试服"});
+        JSONArray resarray = zabbixApiUtils.zbxApiItemGet("system.cpu.util[,user]", new String[]{"10264"});
+//        JSONArray resarray = zabbixApiUtils.zbxApiUsage("hddusage",new String[]{"10264"}, new String[]{"江民测试服"});
 
 
         String historyprettyjson = JSON.toJSONString(resarray, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
@@ -165,7 +170,7 @@ public class ZabbixApiUtils {
 
     }
 
-    public static void main(String[] args){
+    public static void main3(String[] args){
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
@@ -185,6 +190,15 @@ public class ZabbixApiUtils {
 //        }
         System.out.println(resarray.size());
 
+    }
+
+    public static void main2(String[] args) {
+        ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
+
+
+        boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
+
+        System.out.println(zabbixApiUtils.getDataBySingleParam("host.get", "filter",null));
     }
 
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.sys.controller.AbstractController;
+import io.renren.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +44,31 @@ public class FenhuoFaultController extends AbstractController {
     @RequestMapping("/list")
     @RequiresPermissions("fenhuo:fenhuofault:list")
     public R list(@RequestParam Map<String, Object> params){
+
+        Object userObj = getUser();
+        String fenhuouserId;
+        FenhuoUsersEntity fenhuouser = null;
+        if (userObj instanceof SysUserEntity){
+            SysUserEntity sysuser = (SysUserEntity)userObj;
+            fenhuouserId = String.valueOf(-sysuser.getUserId());
+        } else {
+            fenhuouser = (FenhuoUsersEntity)userObj;
+            fenhuouserId = String.valueOf(fenhuouser.getUserid());
+        }
+        Long longuserid = Long.valueOf(fenhuouserId);
+        if(longuserid > 0) {
+            String roleid = fenhuouser.getRoleid();
+            if(roleid.equals("2")){
+                //项目负责人
+                params.put("headid", fenhuouserId);
+            }else if(roleid.equals("1")){
+                //甲方负责人
+                params.put("partyaid", fenhuouserId);
+            }else if(roleid.equals("3")){
+                //维护工程师
+                params.put("servicemid", fenhuouserId);
+            }
+        }
         PageUtils page = fenhuoFaultService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -66,17 +92,22 @@ public class FenhuoFaultController extends AbstractController {
     @RequestMapping("/save")
     @RequiresPermissions("fenhuo:fenhuofault:save")
     public R save(@RequestBody FenhuoFaultEntity fenhuoFault){
+
         // 申报人id
         Long userid = getUserId();
-        FenhuoUsersEntity userMsg = fenhuoUsersService.getById(userid);
+        Object userObj = getUser();
         fenhuoFault.setDeclarer(String.valueOf(userid));
+        if(userObj instanceof FenhuoUsersEntity){
+//            FenhuoUsersEntity userMsg = fenhuoUsersService.getById(userid);
 
-        // 设置申报人姓名
-        fenhuoFault.setDeclarername(userMsg.getRealname());
-		fenhuoFaultService.savefenhuofault(fenhuoFault);
+            // 设置申报人姓名
+            fenhuoFault.setDeclarername(((FenhuoUsersEntity)userObj).getRealname());
 
+        }else{
+            fenhuoFault.setDeclarername(((SysUserEntity)userObj).getUsername());
+        }
 
-
+        fenhuoFaultService.savefenhuofault(fenhuoFault);
         return R.ok();
     }
 

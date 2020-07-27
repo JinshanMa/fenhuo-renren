@@ -2,9 +2,8 @@ package io.renren.modules.fenhuo.service.impl;
 
 import io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
-import io.renren.modules.fenhuo.service.FenhuoFaultdefendService;
-import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
-import io.renren.modules.fenhuo.service.IJGPushService;
+import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.fenhuo.service.*;
 import io.renren.modules.fenhuo.utils.JGPushUtil;
 import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.service.SysConfigService;
@@ -12,8 +11,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -22,7 +21,6 @@ import io.renren.common.utils.Query;
 
 import io.renren.modules.fenhuo.dao.FenhuoFaultDao;
 import io.renren.modules.fenhuo.entity.FenhuoFaultEntity;
-import io.renren.modules.fenhuo.service.FenhuoFaultService;
 
 
 @Service("fenhuoFaultService")
@@ -35,10 +33,16 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     private FenhuoFaultdefendService fenhuoFaultdefendService;
 
     @Autowired
+    private FenhuoFaultService fenhuoFaultService;
+
+    @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
 
     @Autowired
     private IJGPushService jGPushService;
+
+    @Autowired
+    private FenhuoUsersService fenhuoUsersService;
 
     @Override
     public boolean savefenhuofault(FenhuoFaultEntity faultEntity) {
@@ -58,9 +62,12 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
 
         String faultdesc = faultEntity.getFaultdesc();
+
+        String projectid = faultEntity.getProjectid();
         // 获得项目的维护人ids
         QueryWrapper<FenhuoProjectinfoEntity> proinfoWrapper = new QueryWrapper<FenhuoProjectinfoEntity>()
-                .eq("projectid", faultEntity.getProjectid());
+                .eq("projectid", projectid);
+
         FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getOne(proinfoWrapper);
         String mids = projectinfo.getServicemid();
         String names = projectinfo.getServicemname();
@@ -71,6 +78,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         for(int i = 0;i < maintainids.length ;i++){
             FenhuoFaultdefendEntity fenhuoFaultdefend = new FenhuoFaultdefendEntity();
 
+            fenhuoFaultdefend.setProjectid(Long.valueOf(projectid));
             fenhuoFaultdefend.setFaultid(faultEntity.getFaultid());
 
             // 维护人id 和 姓名
@@ -84,22 +92,70 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
             fenhuoFaultdefend.setCreaterid(faultEntity.getDeclarer());
             fenhuoFaultdefend.setCreatername(faultEntity.getDeclarername());
 
-            fenhuoFaultdefend.setCreatetime(new Date());
+            Date iniDate = new Date();
+            fenhuoFaultdefend.setCreatetime(iniDate);
+
+            // 初始化维修时间和创建时间一样，前端判断如果和创建时间一样，则显示“维护未开始”
+            //
+            fenhuoFaultdefend.setDefendstarttime(iniDate);
+            fenhuoFaultdefend.setDefendendtime(iniDate);
+
             fenhuoFaultdefend.setProjectname(projectname);
             fenhuoFaultdefend.setFaultdesc(faultdesc);
 
             fenhuoFaultdefendService.save(fenhuoFaultdefend);
         }
-        //jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, null, null, null);
+
+        Map<String,String> extras = new HashMap<>();
+        extras.put("content",faultdesc);
+        extras.put("projectId",projectid);
+        extras.put("projectName",projectname);
+        extras.put("msgType","extra-msgType");
+        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, extras, null, null);
 
         return true;
     }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+//        String userid = (String)params.get("fenhuouserid");
+        List<String> projectids = new ArrayList<String>();
+
+        QueryWrapper<FenhuoProjectinfoEntity> query = new QueryWrapper<FenhuoProjectinfoEntity>().eq("isdelete", 0)
+                .and(wrapper->wrapper.eq("isactive", 1))
+                .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))))
+                .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))))
+                .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))));
+        List<FenhuoProjectinfoEntity>  projectinfos = fenhuoProjectinfoService.list(query);
+
+        for(FenhuoProjectinfoEntity info :projectinfos){
+            projectids.add(String.valueOf(info.getProjectid()));
+        }
+//        QueryWrapper<FenhuoFaultEntity> query2 = new QueryWrapper<FenhuoFaultEntity>().in("projectid", projectids);
+//        fenhuoFaultService.list(query2);
+//        if(fenhuouser.getRoleid().equals("1")){
+//            // 甲方负责人
+//            QueryWrapper<FenhuoProjectinfoEntity> query = new QueryWrapper<FenhuoProjectinfoEntity>().eq("partyaid", userid);
+//            List<FenhuoProjectinfoEntity>  projectinfos = fenhuoProjectinfoService.list(query);
+//
+//            for(FenhuoProjectinfoEntity info :projectinfos){
+//                projectids.add(String.valueOf(info.getProjectid());
+//            }
+//        }else if(fenhuouser.getRoleid().equals("2")){
+//            // 项目负责人
+//            QueryWrapper<FenhuoProjectinfoEntity> query = new QueryWrapper<FenhuoProjectinfoEntity>().eq("headid", userid);
+//            List<FenhuoProjectinfoEntity>  projectinfos = fenhuoProjectinfoService.list(query);
+//
+//            for(FenhuoProjectinfoEntity info :projectinfos){
+//                projectids.add(String.valueOf(info.getProjectid());
+//            }
+//        }else {
+//            // 维护人员
+//        }
         IPage<FenhuoFaultEntity> page = this.page(
                 new Query<FenhuoFaultEntity>().getPage(params),
-                new QueryWrapper<FenhuoFaultEntity>()
+                new QueryWrapper<FenhuoFaultEntity>().eq("isdelete", 0)
+                        .and(wrapper -> wrapper.in("projectid", projectids))
         );
 
         return new PageUtils(page);
@@ -109,5 +165,11 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         QueryWrapper<SysConfigEntity> serviceMsgConfigWrapper = new QueryWrapper<SysConfigEntity>()
                 .eq(StringUtils.isNotBlank(queryKey),"param_key", queryKey);
         return sysConfigService.getOne(serviceMsgConfigWrapper).getParamValue();
+    }
+
+    private String getREPXEPContent(String userID){
+        String tempContent = "(^"+ userID +",)|(,"+userID+",)|(,"+userID+"$)|(^"+userID+"$)";
+
+        return "\""+tempContent+"\"";
     }
 }

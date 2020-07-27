@@ -3,7 +3,9 @@ package io.renren.modules.fenhuo.service.impl;
 import io.renren.common.exception.RRException;
 import io.renren.common.validator.Assert;
 import io.renren.modules.app.form.LoginForm;
+import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUserSysRoleEntity;
+import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 import io.renren.modules.fenhuo.service.FenhuoUserSysRoleService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysUserRoleService;
@@ -40,6 +42,12 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
     @Autowired
     private FenhuoUserSysRoleService fenhuoUserSysRoleService;
 
+    @Autowired
+    private FenhuoProjectinfoService fenhuoProjectinfoService;
+
+    @Autowired
+    private FenhuoUsersService fenhuoUsersService;
+
     @Override
     public FenhuoUsersEntity queryByMobile(String mobile) {
         return baseMapper.selectOne(new QueryWrapper<FenhuoUsersEntity>().eq("mobile", mobile));
@@ -70,6 +78,41 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
 //        }
 
         return user;
+    }
+
+    @Override
+    public List<FenhuoUsersEntity> queryProjectUserinfo(String projectid, Map<String, Object> params) {
+
+        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
+        String queryRoleid = (String)params.get("roleid");
+        if(StringUtils.isNotBlank(queryRoleid)){
+            if(queryRoleid.equals("1")){
+                // 甲方负责人
+                String amngers =  projectinfo.getPartyaid();
+                String[] amnagerArray = amngers.split(",");
+                QueryWrapper<FenhuoUsersEntity> queryWrapper
+                        = new QueryWrapper<FenhuoUsersEntity>().in("userid", amnagerArray);
+                List<FenhuoUsersEntity> partyaLists = fenhuoUsersService.list(queryWrapper);
+                return partyaLists;
+            } else if(queryRoleid.equals("2")){
+                // 项目负责人
+                String mngers =  projectinfo.getHeadid();
+                String[] mnagerArray = mngers.split(",");
+                QueryWrapper<FenhuoUsersEntity> queryWrapper
+                        = new QueryWrapper<FenhuoUsersEntity>().in("userid", mnagerArray);
+                List<FenhuoUsersEntity> mngersLists = fenhuoUsersService.list(queryWrapper);
+                return mngersLists;
+            } else if(queryRoleid.equals("3")){
+                // 项目维护人员
+                String servicemids =  projectinfo.getServicemid();
+                String[] servicemidsArray = servicemids.split(",");
+                QueryWrapper<FenhuoUsersEntity> queryWrapper
+                        = new QueryWrapper<FenhuoUsersEntity>().in("userid", servicemidsArray);
+                List<FenhuoUsersEntity> servicemidLists = fenhuoUsersService.list(queryWrapper);
+                return servicemidLists;
+            }
+        }
+        return null;
     }
 
     @Override
