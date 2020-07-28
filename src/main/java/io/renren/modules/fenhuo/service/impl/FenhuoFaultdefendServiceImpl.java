@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -53,6 +54,18 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
 
         return new PageUtils(page);
     }
+
+    @Override
+    public void removeByIdsBySetIsDeleted(List<Integer> asList) {
+        Iterator iters = asList.iterator();
+        while (iters.hasNext()) {
+            Integer detetingId = (Integer)iters.next();
+            FenhuoFaultdefendEntity fenhuofaultdefendinfo = getById(detetingId);
+            fenhuofaultdefendinfo.setIsdelete(1);
+            updateById(fenhuofaultdefendinfo);
+        }
+    }
+
     private String getREPXEPContent(String userID){
         String tempContent = "(^"+ userID +",)|(,"+userID+",)|(,"+userID+"$)|(^"+userID+"$)";
 
