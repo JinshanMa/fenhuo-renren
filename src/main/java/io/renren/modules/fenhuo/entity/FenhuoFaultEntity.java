@@ -62,8 +62,9 @@ public class FenhuoFaultEntity implements Serializable {
 	 * 当前网络状态
 	 */
 	private String networkstatus;
+
 	/**
-	 * 故障状态(1 创建成功，2 已取消，3 已解决)
+	 * 故障状态(0未确认 1已确认)
 	 */
 	private Integer faultstatus;
 
