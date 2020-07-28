@@ -11,9 +11,11 @@ package io.renren.modules.app.controller;
 
 import io.renren.common.utils.R;
 import io.renren.common.validator.ValidatorUtils;
+import io.renren.modules.app.annotation.Login;
 import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.app.utils.JwtUtils;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.fenhuo.service.FenhuoUserTokenService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,6 +42,8 @@ public class AppLoginController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    FenhuoUserTokenService fenhuoUserTokenService;
     /**
      * 登录
      */
@@ -55,6 +59,9 @@ public class AppLoginController {
 
         //生成token
         String token = jwtUtils.generateToken(user.getUserid());
+
+        //生成token，并保存到数据库
+        //R r = fenhuoUserTokenService.createToken(user.getUserid());
 
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);

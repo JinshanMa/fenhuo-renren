@@ -105,6 +105,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
             fenhuoFaultdefendService.save(fenhuoFaultdefend);
         }
+
         Map<String,String> extras = new HashMap<>();
         extras.put("content",faultdesc);
         extras.put("projectId",projectid);

@@ -1,5 +1,6 @@
 package io.renren.modules.fenhuo.controller;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -10,6 +11,7 @@ import io.renren.config.UploadFileConfig;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.entity.FenhuoZabbixhostEntity;
 import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
+import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
 import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.fenhuo.utils.ProjectRelatedfileObj;
@@ -43,6 +45,10 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("fenhuo/fenhuoprojectinfo")
 public class FenhuoProjectinfoController extends AbstractController {
+
+    @Autowired
+    private FenhuoUsersService fenhuoUsersService;
+
     @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
 

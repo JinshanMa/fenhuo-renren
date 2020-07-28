@@ -150,4 +150,6 @@ public class FenhuoUsersEntity implements Serializable {
 	 */
 	private String status;
 
+
+
 }

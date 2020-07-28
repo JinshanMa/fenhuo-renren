@@ -149,4 +149,13 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	 */
 	private String log;
 
+	/**
+	 * 原项目负责人
+	 */
+	private String oldheadid;
+	/**
+	 * 原项目负责人名字
+	 */
+	private String oldheadname;
+
 }

@@ -199,21 +199,21 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String servicemid = String.valueOf(projectinfo.getServicemid());
 
 
-        String serviceName = getSysConfig(serviceId).getParamValue();
-        String taskName = getSysConfig(taskid).getParamValue();
-        String audiName = getSysConfig(auditStatus).getParamValue();
+//        String serviceName = getSysConfig(serviceId).getParamValue();
+//        String taskName = getSysConfig(taskid).getParamValue();
+//        String audiName = getSysConfig(auditStatus).getParamValue();
 
-        String headNames = convertToStringName(getUsersMsg(headid));
-        String partyAName = convertToStringName(getUsersMsg(partyaid));
-        String serviceMName = convertToStringName(getUsersMsg(servicemid));
-
-
-        projectinfo.setServiceditemetail(serviceName);
-        projectinfo.setTaskname(taskName);
-        projectinfo.setHeadname(headNames);
-        projectinfo.setPartyaname(partyAName);
-        projectinfo.setServicemname(serviceMName);
-        projectinfo.setAuditname(audiName);
+//        String headNames = convertToStringName(getUsersMsg(headid));
+//        String partyAName = convertToStringName(getUsersMsg(partyaid));
+//        String serviceMName = convertToStringName(getUsersMsg(servicemid));
+//
+//
+//        projectinfo.setServiceditemetail(serviceName);
+//        projectinfo.setTaskname(taskName);
+//        projectinfo.setHeadname(headNames);
+//        projectinfo.setPartyaname(partyAName);
+//        projectinfo.setServicemname(serviceMName);
+//        projectinfo.setAuditname(audiName);
 
         projectinfo.setProjectcreatetime(new Date());
         projectinfo.setIsdelete(0);

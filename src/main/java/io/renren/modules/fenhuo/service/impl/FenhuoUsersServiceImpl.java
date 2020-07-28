@@ -53,6 +53,10 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         return baseMapper.selectOne(new QueryWrapper<FenhuoUsersEntity>().eq("mobile", mobile));
     }
 
+    public FenhuoUsersEntity queryByUserId(String userId) {
+        return baseMapper.selectOne(new QueryWrapper<FenhuoUsersEntity>().eq("userid", userId));
+    }
+
     @Override
     public FenhuoUsersEntity login(LoginForm form) {
         FenhuoUsersEntity user = queryByMobile(form.getMobile());
@@ -66,7 +70,8 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
 
         user.setPushid(form.getPushid());
 
-        save(user);
+
+        baseMapper.updateById(user);
 
 //        if(!user.getPassword().equals(DigestUtils.sha256Hex(form.getPassword()))){
 //            throw new RRException("手机号或密码错误");
