@@ -19,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +41,7 @@ public class AppRegisterController {
 
     @PostMapping("register")
     @ApiOperation("注册")
-    public R register(@RequestBody RegisterForm form){
+    public R register(HttpRequest httpRequest, @RequestBody RegisterForm form){
         //表单校验
         ValidatorUtils.validateEntity(form);
 
@@ -71,7 +72,7 @@ public class AppRegisterController {
         user.setRemark(form.getRemark());
         user.setUniversity(form.getUniversity());
         user.setExperience(form.getExperience());
-
+        user.setStatus("0");
 
         fenhuoUsersService.saveFenhuoUser(user);
 

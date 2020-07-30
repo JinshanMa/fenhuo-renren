@@ -17,8 +17,12 @@ import io.renren.modules.app.utils.JwtUtils;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoUserTokenService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysUserService;
+import io.renren.modules.sys.service.SysUserTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,35 +43,107 @@ import java.util.Map;
 public class AppLoginController {
     @Autowired
     private FenhuoUsersService fenhuoUsersService;
+
     @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
     FenhuoUserTokenService fenhuoUserTokenService;
+
+    @Autowired
+    SysUserService sysUserService;
+
+    @Autowired
+    SysUserTokenService sysUserTokenService;
+
     /**
      * 登录
      */
     @PostMapping("login")
     @ApiOperation("登录")
     public R login(@RequestBody LoginForm form){
-        //表单校验
-        ValidatorUtils.validateEntity(form);
-
-        //用户登录
-        FenhuoUsersEntity user = fenhuoUsersService.login(form);
 
 
-        //生成token
-        String token = jwtUtils.generateToken(user.getUserid());
+        //用户信息
+        SysUserEntity user = sysUserService.queryByUserName(form.getMobile());
+        ///////////////////此处处理账户不是系统用户的步骤，目前挑战到烽火账户下处理
+        FenhuoUsersEntity fenhuoUsers = null;
+        if(user == null){
+//            fenhuoUsers = fenhuoUsersService.sysOverQueryByUserName(form.getMobile());
 
-        //生成token，并保存到数据库
-        //R r = fenhuoUserTokenService.createToken(user.getUserid());
+//            ///////////////////此处处理账户不是系统用户的步骤---end
+//            //账号不存在、密码错误
+//
+//            /// 添加烽火账户的检测
+//            if( fenhuoUsers == null || !fenhuoUsers.getPassword().equals(new Sha256Hash(form.getPassword(), fenhuoUsers.getSalt()).toHex())) {
+//                return R.error("账号或密码不正确");
+//            }
+//
+//            //账号锁定
+//            if(fenhuoUsers.getStatus() == "0"){
+//                return R.error("账号已被锁定,请联系管理员");
+//            }
+//
+//            //生成token，并保存到数据库
+//            R r = fenhuoUserTokenService.createToken(fenhuoUsers.getUserid());
+//            return r;
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("token", token);
-        map.put("expire", jwtUtils.getExpire());
-        map.put("user", user);
-        return R.ok(map);
+            //表单校验
+            ValidatorUtils.validateEntity(form);
+
+            //用户登录
+            fenhuoUsers = fenhuoUsersService.login(form);
+            if (user.getStatus().equals("0")){
+                return R.error(500,"账号正在审核中");
+            }
+
+            if (fenhuoUsers.getIsdelete() == 1){
+                return R.error(500,"账号异常");
+            }
+
+            //生成token
+            String token = jwtUtils.generateToken(fenhuoUsers.getUserid());
+
+            //生成token，并保存到数据库
+            //R r = fenhuoUserTokenService.createToken(user.getUserid());
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", token);
+            map.put("expire", jwtUtils.getExpire());
+            map.put("user", fenhuoUsers);
+            map.put("admin",false);
+            return R.ok(map);
+
+
+        }else{
+            if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
+                return R.error("账号或密码不正确");
+            }
+
+            //账号锁定
+            if(user.getStatus() == 0){
+                return R.error("账号已被锁定,请联系管理员");
+            }
+
+
+            //生成token
+            String token = jwtUtils.generateToken(user.getUserId());
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", token);
+            map.put("expire", jwtUtils.getExpire());
+            map.put("user", user);
+            map.put("admin",true);
+            return R.ok(map);
+
+//            //生成token，并保存到数据库
+//            R r = sysUserTokenService.createToken(user.getUserId());
+//            r.put("user",user);
+//            r.put("admin",true);
+//            return r;
+        }
+
+
     }
 
 }

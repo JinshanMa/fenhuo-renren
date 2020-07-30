@@ -13,8 +13,6 @@ import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
 import io.renren.modules.fenhuo.utils.ZabbixApiUtils;
 import io.renren.modules.sys.controller.AbstractController;
-import io.renren.modules.sys.entity.SysUserEntity;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

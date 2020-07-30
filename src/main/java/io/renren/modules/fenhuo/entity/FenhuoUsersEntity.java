@@ -148,7 +148,7 @@ public class FenhuoUsersEntity implements Serializable {
 	/**
 	 * 状态
 	 */
-	private String status;
+	private String status;//0审核中  1正常
 
 
 
