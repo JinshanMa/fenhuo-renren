@@ -102,7 +102,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
             fenhuoFaultdefend.setProjectname(projectname);
             fenhuoFaultdefend.setFaultdesc(faultdesc);
-
+            fenhuoFaultdefend.setDefendresult(0);
             fenhuoFaultdefendService.save(fenhuoFaultdefend);
         }
 

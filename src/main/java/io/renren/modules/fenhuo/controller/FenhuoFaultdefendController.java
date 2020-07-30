@@ -108,7 +108,9 @@ public class FenhuoFaultdefendController extends AbstractController {
     @RequestMapping("/delete")
     @RequiresPermissions("fenhuo:fenhuofaultdefend:delete")
     public R delete(@RequestBody Integer[] defendids){
-		fenhuoFaultdefendService.removeByIds(Arrays.asList(defendids));
+
+//		fenhuoFaultdefendService.removeByIds(Arrays.asList(defendids));
+        fenhuoFaultdefendService.removeByIdsBySetIsDeleted(Arrays.asList(defendids));
 
         return R.ok();
     }

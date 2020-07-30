@@ -49,7 +49,7 @@ public class FenhuoFaultdefendEntity implements Serializable {
 	 */
 	private String plan;
 	/**
-	 * 维护结果(1 成功，2 失败)
+	 * 维护结果(0未开始, 1 进行中，2 完成， -1 失败)
 	 */
 	private Integer defendresult;
 	/**
