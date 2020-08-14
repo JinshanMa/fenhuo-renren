@@ -19,12 +19,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 
 /**
@@ -41,7 +42,20 @@ public class AppRegisterController {
 
     @PostMapping("register")
     @ApiOperation("注册")
-    public R register(HttpRequest httpRequest, @RequestBody RegisterForm form){
+    public R register(HttpServletRequest httpRequest, @RequestBody RegisterForm form){
+
+
+        final HttpSession httpSession = httpRequest.getSession();
+        Object codeObj = httpSession.getAttribute(form.getMobile());
+        if (codeObj == null){
+            return R.error(500,"验证码过期");
+        }else {
+            String code = codeObj.toString();
+            if (code.equals("") || code.length() == 0 || !code.equals(form.getValid())) {
+                return R.error(500, "验证码无效");
+            }
+        }
+
         //表单校验
         ValidatorUtils.validateEntity(form);
 

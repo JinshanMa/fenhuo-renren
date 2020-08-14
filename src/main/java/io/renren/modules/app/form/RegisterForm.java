@@ -27,6 +27,8 @@ public class RegisterForm {
     @NotBlank(message="手机号不能为空")
     private String mobile;
 
+
+
     @ApiModelProperty(value = "密码")
     @NotBlank(message="密码不能为空")
     private String password;

@@ -148,7 +148,7 @@ public class ZabbixApiUtils {
 
 
 
-    public static void main(String[] args){
+    public static void main1(String[] args){
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
@@ -170,7 +170,7 @@ public class ZabbixApiUtils {
 
     }
 
-    public static void main3(String[] args){
+    public static void main(String[] args){
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 

@@ -22,13 +22,12 @@ import io.renren.modules.sys.service.SysUserService;
 import io.renren.modules.sys.service.SysUserTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,12 +55,15 @@ public class AppLoginController {
     @Autowired
     SysUserTokenService sysUserTokenService;
 
+
+    public static final String USER_KEY = "userId";
+    private static final String IS_SYS_USER = "isSysUser";
     /**
      * 登录
      */
     @PostMapping("login")
     @ApiOperation("登录")
-    public R login(@RequestBody LoginForm form){
+    public R login(HttpServletRequest request,@RequestBody LoginForm form){
 
 
         //用户信息
@@ -112,6 +114,10 @@ public class AppLoginController {
             map.put("expire", jwtUtils.getExpire());
             map.put("user", fenhuoUsers);
             map.put("admin",false);
+
+            //0表示非系统用户
+            request.setAttribute(IS_SYS_USER,"0");
+
             return R.ok(map);
 
 
@@ -121,10 +127,9 @@ public class AppLoginController {
             }
 
             //账号锁定
-            if(user.getStatus() == 0){
+            if(user.getStatus() == 0) {
                 return R.error("账号已被锁定,请联系管理员");
             }
-
 
             //生成token
             String token = jwtUtils.generateToken(user.getUserId());
@@ -134,6 +139,9 @@ public class AppLoginController {
             map.put("expire", jwtUtils.getExpire());
             map.put("user", user);
             map.put("admin",true);
+            //1表示系统用户，即管理员账号
+            request.setAttribute(IS_SYS_USER,"1");
+
             return R.ok(map);
 
 //            //生成token，并保存到数据库
@@ -145,5 +153,24 @@ public class AppLoginController {
 
 
     }
+
+    @Login
+    @PostMapping("logout")
+    public R logout(@RequestParam String userId,@RequestParam String isSys){
+
+        if (isSys.equals("1")){
+            SysUserEntity u = sysUserService.getById(userId);
+
+        }else {
+
+            FenhuoUsersEntity u = fenhuoUsersService.getById(userId);
+            u.setPushid("");
+            fenhuoUsersService.saveOrUpdate(u);
+
+        }
+
+        return R.ok();
+    }
+
 
 }

@@ -16,10 +16,7 @@ import io.renren.modules.sys.controller.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("app/project")
@@ -61,6 +58,7 @@ public class AppProjectController extends AbstractController {
     }
 
 
+    @Login
     @RequestMapping("/info/{projectid}")
     public R info(@PathVariable("projectid") String projectid) {
         FenhuoProjectinfoEntity fenhuoProjectinfo = fenhuoProjectinfoService.getById(projectid);
@@ -108,7 +106,38 @@ public class AppProjectController extends AbstractController {
             fenhuoZabbixhostService.save(fenhuoZabbixhost);
         }
         return R.ok();
+
     }
+
+
+    @Login
+    @RequestMapping("/verify/{projectid}")
+    public R verify(@PathVariable("projectid") String projectid){
+
+        FenhuoProjectinfoEntity projectinfoEntity = fenhuoProjectinfoService.getById(projectid);
+        projectinfoEntity.setIsactive(1);
+
+        fenhuoProjectinfoService.updateProjectInfo(projectinfoEntity);
+
+        return R.ok();
+    }
+
+
+    @Login
+    @RequestMapping("reject/{projectid}")
+    public R reject(@PathVariable("projectid") String projectid){
+        FenhuoProjectinfoEntity projectinfoEntity = fenhuoProjectinfoService.getById(projectid);
+        projectinfoEntity.setIsdelete(1);
+
+        Collection collection = new ArrayList<String>();
+        collection.add(projectid);
+        fenhuoProjectinfoService.removeByIdsBySetIsDeleted(collection);
+
+        return R.ok();
+
+    }
+
+
 
 }
 
