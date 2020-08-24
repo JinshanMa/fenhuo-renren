@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public interface FenhuoFaultService extends IService<FenhuoFaultEntity> {
 
+    void saveFault(FenhuoFaultEntity fenhuoFaultEntity);
     boolean savefenhuofault(FenhuoFaultEntity fenhuoFaultEntity);
     PageUtils queryPage(Map<String, Object> params);
 }

@@ -44,13 +44,13 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
 
         String endDate = (String)params.get("endDate");
 
-        String opusername = (String)params.get("opusername");
+        String opusername = (String)params.get("opersoname");
 
         String opname = (String)params.get("opname");
 
         String projname = (String)params.get("projname");
 
-
+        String projectid = (String)params.get("projectid");
 
         QueryWrapper<FenhuoOperationlogEntity>  queryWrapper = new QueryWrapper<FenhuoOperationlogEntity>();
         QueryWrapper<FenhuoOperationlogEntity> queryChild = (QueryWrapper<FenhuoOperationlogEntity>)queryWrapper.eq("isdelete", 0);
@@ -62,13 +62,16 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
                     .le("date_format(opdatetime,'%Y-%m-%d')", endDate));
         }
         if(StringUtils.isNotBlank(opusername)){
-            queryChild.and(wrapper->wrapper.like("opersoname", opusername));
+            queryChild.and(wrapper->wrapper.like("opusername", opusername));
         }
         if(StringUtils.isNotBlank(opname)){
             queryChild.and(wrapper->wrapper.like("opname", opname));
         }
         if(StringUtils.isNotBlank(projname)){
             queryChild.and(wrapper->wrapper.like("projectname", projname));
+        }
+        if(StringUtils.isNotBlank(projectid)){
+            queryChild.and(wrapper->wrapper.eq("projectid", projectid));
         }
 
 

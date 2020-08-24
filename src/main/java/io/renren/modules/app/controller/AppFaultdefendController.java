@@ -23,7 +23,7 @@ public class AppFaultdefendController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
 
-        PageUtils page = fenhuoFaultdefendService.queryPage(params);
+        PageUtils page = fenhuoFaultdefendService.queryWithStatu(params);
         return R.ok().put("page", page);
 
     }

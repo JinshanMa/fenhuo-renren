@@ -53,7 +53,7 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	 */
 	private Date projectcreatetime;
 	/**
-	 * 
+	 *
 	 */
 	private String effectivetime;
 	/**
@@ -118,7 +118,7 @@ public class FenhuoProjectinfoEntity implements Serializable {
 
 	private String creater;
 	/**
-	 * 审批状态
+	 * 审批状态: 0未审批 1已审批 2已结束
 	 */
 	private Integer auditstatus;
 

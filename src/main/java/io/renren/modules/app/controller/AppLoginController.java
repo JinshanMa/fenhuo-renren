@@ -95,7 +95,7 @@ public class AppLoginController {
 
             //用户登录
             fenhuoUsers = fenhuoUsersService.login(form);
-            if (user.getStatus().equals("0")){
+            if (fenhuoUsers.getStatus().equals("0")){
                 return R.error(500,"账号正在审核中");
             }
 

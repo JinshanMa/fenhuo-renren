@@ -48,6 +48,31 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     @Autowired
     private UploadFileConfig uploadFileConfig;
 
+    public PageUtils queryPageWithParam(Map<String, Object> params) {
+
+        String keyword = (String)params.get("keyword");
+        String startDate = (String)params.get("startDate");
+        String endDate = (String)params.get("endDate");
+
+        QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<FenhuoProjectinfoEntity>();
+        QueryWrapper<FenhuoProjectinfoEntity> queryChild = (QueryWrapper<FenhuoProjectinfoEntity>)queryWrapper.eq("isdelete", 0);
+        if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
+            queryChild.and(wrapper->wrapper.ge("date_format(create_time,'%Y-%m-%d')",startDate)
+                    .le("date_format(create_time,'%Y-%m-%d')", endDate));
+        }
+        if (StringUtils.isNotBlank(keyword)){
+            queryChild.and(wrapper->wrapper.like("projectname", keyword));
+        }
+
+        IPage<FenhuoProjectinfoEntity> page = this.page(
+                new Query<FenhuoProjectinfoEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
+    }
+
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<FenhuoProjectinfoEntity> page = this.page(
@@ -69,6 +94,10 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         );
         return new PageUtils(page);
     }
+
+
+
+
 
     @Override
     public PageUtils querySelectedPage(Map<String, Object> params) {

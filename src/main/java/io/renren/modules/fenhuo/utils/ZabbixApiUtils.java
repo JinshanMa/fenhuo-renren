@@ -92,12 +92,12 @@ public class ZabbixApiUtils {
      * @param hostids
      * @return
      */
-    public JSONArray zbxApiUsage(String itemname,String[] hostids, String[] hostnames){
+    public JSONArray zbxApiUsage(String itemname,String[] hostids, String[] hostnames) {
         JSONArray resarray;
         switch (itemname) {
             case "cpusage":
                 resarray = zbxApiItemGet(CPU_USAGE_KEY, hostids);
-                if (resarray.size() <= 0){
+                if (resarray.size() <= 0) {
                     resarray = zbxApiItemGet(WINDOWS_CPU_LOAD_KEY, hostids);
                 }
                 break;
@@ -116,24 +116,24 @@ public class ZabbixApiUtils {
         List<String> hostidsList = Arrays.asList(hostids);
 
         JSONArray resultArray = new JSONArray();
-        for(int i = 0;i < resarray.size();i++){
-            String itemid = (String)resarray.getJSONObject(i).get("itemid");
-            String hostid = (String)resarray.getJSONObject(i).get("hostid");
+        for (int i = 0; i < resarray.size(); i++) {
+            String itemid = (String) resarray.getJSONObject(i).get("itemid");
+            String hostid = (String) resarray.getJSONObject(i).get("hostid");
             JSONObject historyqueryjson = new JSONObject();
             JSONObject hostid2jsonobjct = new JSONObject();
 
             historyqueryjson.put("output", "extend");
-            if(itemname.equals("ifusage")) {
+            if (itemname.equals("ifusage")) {
                 historyqueryjson.put("history", 3);
-            }else{
+            } else {
                 historyqueryjson.put("history", 0);
             }
             historyqueryjson.put("itemids", new String[]{itemid});
             historyqueryjson.put("sortfield", "clock");
-            historyqueryjson.put("sortorder","DESC");
+            historyqueryjson.put("sortorder", "DESC");
             historyqueryjson.put("limit", HISTORY_LIMIT_COUNT);
 
-            JSONObject historyjsonData = getDataByMethod("history.get",historyqueryjson);
+            JSONObject historyjsonData = getDataByMethod("history.get", historyqueryjson);
             JSONArray historyObj = (JSONArray) historyjsonData.get("result");
 
             int hosidindex = hostidsList.indexOf(hostid);
