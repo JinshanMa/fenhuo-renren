@@ -2,6 +2,22 @@ package io.renren.modules.fenhuo.utils;
 
 public class OpUtils {
 
+    public String getPath()
+    {
+        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+        if(System.getProperty("os.name").contains("dows"))
+        {
+            System.out.println("before substring;" + path);
+            path = path.substring(1);
+            System.out.println("after substring;" + path);
+        }
+        if(path.contains("jar"))
+        {
+            path = path.substring(0,path.lastIndexOf("."));
+            return path.substring(0,path.lastIndexOf("/"));
+        }
+        return path.replace("target/classes/", "");
+    }
 
 
     public static EPlatform osName(){

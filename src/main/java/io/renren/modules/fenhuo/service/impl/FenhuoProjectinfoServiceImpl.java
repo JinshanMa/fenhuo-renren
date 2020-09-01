@@ -1,9 +1,12 @@
 package io.renren.modules.fenhuo.service.impl;
 
 import io.renren.config.UploadFileConfig;
+import io.renren.modules.fenhuo.entity.FenhuoProjectfileEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.modules.fenhuo.service.FenhuoProjectfileService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
+import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysConfigService;
@@ -48,6 +51,10 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     @Autowired
     private UploadFileConfig uploadFileConfig;
 
+
+    @Autowired
+    private FenhuoProjectfileService fenhuoProjectfileService;
+
     public PageUtils queryPageWithParam(Map<String, Object> params) {
 
         String keyword = (String)params.get("keyword");
@@ -71,7 +78,6 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
         return new PageUtils(page);
     }
-
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -173,6 +179,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
             Long detetingId = Long.parseLong((String) iters.next());
             FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
             fenhuoProjectinfo.setIsactive(1);
+
             updateById(fenhuoProjectinfo);
         }
 
@@ -228,21 +235,21 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String servicemid = String.valueOf(projectinfo.getServicemid());
 
 
-//        String serviceName = getSysConfig(serviceId).getParamValue();
-//        String taskName = getSysConfig(taskid).getParamValue();
-//        String audiName = getSysConfig(auditStatus).getParamValue();
+        String serviceName = getSysConfig(serviceId).getParamValue();
+        String taskName = getSysConfig(taskid).getParamValue();
+        String audiName = getSysConfig(auditStatus).getParamValue();
 
-//        String headNames = convertToStringName(getUsersMsg(headid));
-//        String partyAName = convertToStringName(getUsersMsg(partyaid));
-//        String serviceMName = convertToStringName(getUsersMsg(servicemid));
-//
-//
-//        projectinfo.setServiceditemetail(serviceName);
-//        projectinfo.setTaskname(taskName);
-//        projectinfo.setHeadname(headNames);
-//        projectinfo.setPartyaname(partyAName);
-//        projectinfo.setServicemname(serviceMName);
-//        projectinfo.setAuditname(audiName);
+        String headNames = convertToStringName(getUsersMsg(headid));
+        String partyAName = convertToStringName(getUsersMsg(partyaid));
+        String serviceMName = convertToStringName(getUsersMsg(servicemid));
+
+
+        projectinfo.setServiceditemetail(serviceName);
+        projectinfo.setTaskname(taskName);
+        projectinfo.setHeadname(headNames);
+        projectinfo.setPartyaname(partyAName);
+        projectinfo.setServicemname(serviceMName);
+        projectinfo.setAuditname(audiName);
 
         projectinfo.setProjectcreatetime(new Date());
         projectinfo.setIsdelete(0);
@@ -262,10 +269,18 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
                 .in(useridArray.length > 0,"userid", useridArray);
         List<FenhuoUsersEntity> fenhuoList = fenhuoUsersService.list(fenhuoUserWrapper);
 
-
+        List<String> reverseUserid = new ArrayList<>();
+        for(String userid : useridArray){
+            Long longUserid = Long.valueOf(userid);
+            if (longUserid < 0){
+                longUserid = -longUserid;
+            }
+            reverseUserid.add(String.valueOf(longUserid));
+        }
+        String[] reverseArrayUserid = reverseUserid.toArray(new String[]{});
         if(fenhuoList.size() <= 0){
             QueryWrapper<SysUserEntity> sysUserWrapper = new QueryWrapper<SysUserEntity>()
-                    .in(useridArray.length > 0,"user_id", useridArray);
+                    .in(reverseArrayUserid.length > 0,"user_id", reverseArrayUserid);
             return  sysUserService.list(sysUserWrapper);
         }
         return fenhuoList;
@@ -304,7 +319,16 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
         FenhuoProjectinfoEntity projectinfo = getById(Long.valueOf(prjid));
 
-        String path = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
+//        String path = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
+        OpUtils opUtils = new OpUtils();
+        String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
+
+        QueryWrapper<FenhuoProjectfileEntity> queryWrapper = new  QueryWrapper<FenhuoProjectfileEntity>()
+                .eq("projectid", Integer.valueOf(prjid));
+
+        FenhuoProjectfileEntity file = fenhuoProjectfileService.list(queryWrapper).get(0);
+
+        String path = projuploadir + file.getFilepath();
         String fileName = request.getParameter("fileName");
         String filePath = path + fileName;
         File excelFile = new File(filePath);

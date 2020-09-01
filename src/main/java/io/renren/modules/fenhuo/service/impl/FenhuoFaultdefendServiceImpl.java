@@ -78,7 +78,8 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
         IPage<FenhuoFaultdefendEntity> page = this.page(
                 new Query<FenhuoFaultdefendEntity>().getPage(params),
                 new QueryWrapper<FenhuoFaultdefendEntity>().eq("isdelete", 0)
-                        .and(wrapper->wrapper.in("projectid", projectids))
+                        .and(wrapper->wrapper.eq("defendresult", (String)params.get("faultType")))
+                        .and(wrapper->wrapper.in(projectids.size() > 0, "projectid", projectids))
         );
 
         return new PageUtils(page);

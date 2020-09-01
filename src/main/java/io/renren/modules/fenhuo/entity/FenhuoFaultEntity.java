@@ -36,6 +36,17 @@ public class FenhuoFaultEntity implements Serializable {
 	 * 项目IP
 	 */
 	private String ip;
+
+	/**
+	 * 主机名
+	 */
+	private String hostname;
+
+	/**
+	 * zabbix主机id
+	 */
+	private String hostid;
+
 	/**
 	 * 设备名
 	 */

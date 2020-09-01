@@ -54,6 +54,15 @@ public class ZabbixApiUtils {
 //        System.out.println(getResponse);
         return getResponse;
     }
+    public JSONObject getDataBySingleParamArray(String method, String paramkeyname, String[] data){
+        Request getRequest = RequestBuilder.newBuilder()
+                .method(method)
+                .paramEntry(paramkeyname, data)
+                .build();
+        JSONObject getResponse = zabbixApi.call(getRequest);
+//        System.out.println(getResponse);
+        return getResponse;
+    }
 
     public JSONObject getDataByMethod(String method, JSONObject filter){
         RequestBuilder getRequestBuilder = RequestBuilder.newBuilder().method(method);
@@ -148,7 +157,8 @@ public class ZabbixApiUtils {
 
 
 
-    public static void main1(String[] args){
+    public static void main3(String[] args){
+
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
@@ -170,7 +180,8 @@ public class ZabbixApiUtils {
 
     }
 
-    public static void main(String[] args){
+    public static void main4(String[] args){
+
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
@@ -192,13 +203,16 @@ public class ZabbixApiUtils {
 
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
 
 
         boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
 
-        System.out.println(zabbixApiUtils.getDataBySingleParam("host.get", "filter",null));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("hostids", new String[] {"10084","10264"});
+
+        System.out.println(zabbixApiUtils.getDataBySingleParamArray("host.get", "hostids",new String[] {"10084","10264","10267","10270"}));
     }
 
 

@@ -5,6 +5,7 @@ import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
 import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
+import io.renren.modules.fenhuo.service.IJGPushService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +37,9 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
 
     @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
+
+    @Autowired
+    private IJGPushService jGPushService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -92,11 +96,20 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
             FenhuoOperationlogEntity oplog = aspectCommonProcess(userid);
             FenhuoProjectinfoRequest requestObj = (FenhuoProjectinfoRequest)paramsObj[0];
             FenhuoProjectinfoEntity projectinfo = requestObj.getProjectinfo();
-            oplog.setProjectid(projectinfo.getProjectid());
-            oplog.setProjectname(projectinfo.getProjectname());
+            String projectname = projectinfo.getProjectname();
+            Long projectid = projectinfo.getProjectid();
+            oplog.setProjectid(projectid);
+            oplog.setProjectname(projectname);
             oplog.setIsdelete(0);
-            if (opname.equals("save"))
+            if (opname.equals("save")) {
                 oplog.setOpname("新建项目");
+                Map<String,String> extras = new HashMap<>();
+                extras.put("content","新建项目,待审核");
+                extras.put("projectId",String.valueOf(projectid));
+                extras.put("projectName",projectname);
+                extras.put("msgType","extra-msgType");
+                jGPushService.notifyAdmin(projectname, "新建项目,待审核", extras, null, null);
+            }
             else
                 oplog.setOpname("更新项目");
             save(oplog);
