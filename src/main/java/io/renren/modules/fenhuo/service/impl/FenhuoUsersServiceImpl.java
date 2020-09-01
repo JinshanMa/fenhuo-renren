@@ -127,6 +127,8 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
 
         String roleid = (String)params.get("roleid");
 
+        String address = (String)params.get("address");
+
         QueryWrapper<FenhuoUsersEntity>  queryWrapper = new QueryWrapper<FenhuoUsersEntity>();
         QueryWrapper<FenhuoUsersEntity> queryChild = (QueryWrapper<FenhuoUsersEntity>)queryWrapper.eq("isdelete", 0);
 
@@ -144,6 +146,10 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         }
         if(StringUtils.isNotBlank(roleid)){
             queryChild.and(wrapper->wrapper.like("roleid", roleid));
+        }
+
+        if(StringUtils.isNotBlank(address)){
+            queryChild.and(wrapper->wrapper.like("address", address));
         }
 
         IPage<FenhuoUsersEntity> page = this.page(
@@ -235,48 +241,48 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
 //            continue;
             Row row1 = sheet2.getRow(j);
             // 如果单元格中有数字或者其他格式的数据，则调用setCellType()转换为string类型
-            Cell excelId = row1.getCell(0, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
+            Cell excelId = row1.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             excelId.setCellType(CellType.STRING);
             //获取表中第i行，第2列的单元格
-            Cell userName = row1.getCell(1, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
+            Cell userName = row1.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             userName.setCellType(CellType.STRING);
             //获取excel表的第i行，第3列的单元格
-            Cell password = row1.getCell(2, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
+            Cell password = row1.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             password.setCellType(CellType.STRING);
 
-            Cell roleName = row1.getCell(3, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
+            Cell roleName = row1.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             roleName.setCellType(CellType.STRING);
 
-            Cell realName = row1.getCell(4, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            Cell realName = row1.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             realName.setCellType(CellType.STRING);
-            Cell sex = row1.getCell(5);
+            Cell sex = row1.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             sex.setCellType(CellType.STRING);
 
-            Cell orgnazationName = row1.getCell(6);
+            Cell orgnazationName = row1.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             orgnazationName.setCellType(CellType.STRING);
 
-            Cell companyName = row1.getCell(7);
+            Cell companyName = row1.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             companyName.setCellType(CellType.STRING);
 
-            Cell contact = row1.getCell(8);
+            Cell contact = row1.getCell(8,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             contact.setCellType(CellType.STRING);
 
-            Cell contactTel = row1.getCell(9);
+            Cell contactTel = row1.getCell(9,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             contactTel.setCellType(CellType.STRING);
 
-            Cell university = row1.getCell(10);
+            Cell university = row1.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             university.setCellType(CellType.STRING);
 
-            Cell skill = row1.getCell(11);
+            Cell skill = row1.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             skill.setCellType(CellType.STRING);
 
-            Cell provice = row1.getCell(12);
+            Cell provice = row1.getCell(12, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             provice.setCellType(CellType.STRING);
 
-            Cell city = row1.getCell(12);
+            Cell city = row1.getCell(13, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             city.setCellType(CellType.STRING);
 
-            Cell area = row1.getCell(14);
+            Cell area = row1.getCell(14, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             area.setCellType(CellType.STRING);
 
 //            System.out.println(cell1.getStringCellValue()+","+cell2.getStringCellValue()+","+cell3.getStringCellValue()+","+cell15.getStringCellValue());
@@ -285,13 +291,36 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
             user.setRoleid(userType);
             user.setMobile(contactTel.getStringCellValue());
             user.setLoginname(userName.getStringCellValue());
-            user.setPassword(userName.getStringCellValue());
+
+            //sha256加密
+            String salt = RandomStringUtils.randomAlphanumeric(20);
+            user.setSalt(salt);
+            user.setPassword(new Sha256Hash(password.getStringCellValue(), salt).toHex());
+
             user.setOrgname(orgnazationName.getStringCellValue());
             String sexStr = (sex.getStringCellValue() == "男" ? "man":"women");
             user.setSex(sexStr);
 
             user.setRealname(realName.getStringCellValue());
-            user.setRolename(roleName.getStringCellValue());
+            switch (userType) {
+                case "1":
+                    user.setRolename("甲方负责人");
+                    break;
+                case "2":
+                    user.setRolename("项目负责人");
+                    break;
+                case "3":
+                    user.setRolename("维护工程师");
+                    break;
+                case "5":
+                    user.setRolename("注册工程师");
+                    break;
+                case "6":
+                    user.setRolename("注册用户");
+                    break;
+
+            }
+
             user.setCreateTime(new Date());
             user.setIsdelete(0);
             user.setCompanyname(companyName.getStringCellValue());

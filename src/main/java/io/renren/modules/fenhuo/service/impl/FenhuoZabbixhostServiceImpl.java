@@ -62,11 +62,12 @@ public class FenhuoZabbixhostServiceImpl extends ServiceImpl<FenhuoZabbixhostDao
     public JSONObject authrizedTestAndGetHosts(Map<String, Object> params) {
         String username = (String)params.get("zbxUsername");
         String password = (String)params.get("zbxPassword");
+
         if(StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)){
             ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
             if(zabbixApiUtils.zabbixLogin(username,password)){
-                return zabbixApiUtils.getDataBySingleParam("host.get", "filter",null);
-
+                JSONObject jsonData =  zabbixApiUtils.getDataBySingleParam("host.get", "filter",null);
+                return jsonData;
             }else{
                 return null;
             }

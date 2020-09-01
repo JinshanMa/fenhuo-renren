@@ -10,6 +10,8 @@ import io.renren.modules.fenhuo.service.FenhuoPushlogService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.IJGPushService;
 import io.renren.modules.fenhuo.utils.JGPushUtil;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +28,12 @@ public class JGPushServiceImpl implements IJGPushService {
 
     @Autowired
     private FenhuoProjectinfoService fenhuoProjectinfoService;
-    @Autowired
 
+    @Autowired
     private FenhuoPushlogService fenhuoPushlogService;
+
+    @Autowired
+    private SysUserService sysUserService;
 
 
     @Override
@@ -94,6 +99,31 @@ public class JGPushServiceImpl implements IJGPushService {
 
     @Override
     public void notifyAdmin(String title, String content, Map<String, String> extras, String msgType,String msgRemark) {
+        QueryWrapper<SysUserEntity> queryWrapper = new QueryWrapper<SysUserEntity>();
+        queryWrapper.ne("username", "admin");
+        List<SysUserEntity> fenghuoUsers = sysUserService.list(queryWrapper);
+        String projectId = (String)extras.get("projectId");
+//        FenhuoProjectinfoEntity projectInfo = getProjectInfo(projectId,title,content);
+
+        for (SysUserEntity user : fenghuoUsers){
+            if (StringUtils.isNotBlank(user.getPushid())) {
+                logger.info("给管理人员推送通知，推送ID："+user.getPushid());
+                boolean b = JGPushUtil.pushMsgByRegID(user.getPushid(), title, content, extras);
+                if (b){
+                    FenhuoPushlogEntity pushlog = new FenhuoPushlogEntity();
+                    pushlog.setProjectid(Long.valueOf(projectId));
+                    pushlog.setPushid(user.getPushid());
+                    pushlog.setPushtitle(title);
+                    pushlog.setPushtxt(content);
+                    pushlog.setPushtime(new Date());
+                    boolean insert = fenhuoPushlogService.save(pushlog);
+                    logger.info("给维护人员推送通知，添加推送日志结果："+insert);
+
+                }
+            } else {
+                logger.info("管理员用户："+user.getUserId()+"推送ID为空，无法推送！" );
+            }
+        }
 
     }
 

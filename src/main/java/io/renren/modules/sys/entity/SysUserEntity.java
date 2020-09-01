@@ -55,6 +55,10 @@ public class SysUserEntity implements Serializable {
 	private String salt;
 
 	/**
+	 * 管理员推送id
+	 */
+	private String pushid;
+	/**
 	 * 邮箱
 	 */
 	@NotBlank(message="邮箱不能为空", groups = {AddGroup.class, UpdateGroup.class})

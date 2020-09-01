@@ -103,6 +103,8 @@ public class SysLoginController extends AbstractController {
 			R r = fenhuoUserTokenService.createToken(fenhuoUsers.getUserid());
 			return r;
 		}else{
+			String pass = user.getPassword();
+			String hex = new Sha256Hash(form.getPassword(), user.getSalt()).toHex();
 			if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
 				return R.error("账号或密码不正确");
 			}
