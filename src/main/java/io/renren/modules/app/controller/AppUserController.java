@@ -12,6 +12,8 @@ import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.utils.JGPushUtil;
 import io.renren.modules.sys.service.SysRoleService;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -107,6 +109,27 @@ public class AppUserController {
         fenhuoUsersService.isDeleteByIds(Arrays.asList(userids));
         return R.ok();
     }
+
+//    @PostMapping("/modifypwd")
+    @RequestMapping("/modifypwd")
+    public R modifyPwd(@RequestParam("userid") String userid,@RequestParam("oldpwd") String oldpwd,@RequestParam("newpwd") String newpwd){
+
+        FenhuoUsersEntity fenhuoUser = fenhuoUsersService.getById(userid);
+
+        if(!fenhuoUser.getPassword().equals(new Sha256Hash(oldpwd, fenhuoUser.getSalt()).toHex())) {
+            return R.error("密码错误");
+        }
+
+        //sha256加密
+        String salt = RandomStringUtils.randomAlphanumeric(20);
+
+        fenhuoUser.setPassword(new Sha256Hash(newpwd, salt).toHex());
+        fenhuoUser.setSalt(salt);
+        fenhuoUsersService.saveOrUpdate(fenhuoUser);
+
+        return R.ok();
+    }
+
 
     /**
      * 上传文件

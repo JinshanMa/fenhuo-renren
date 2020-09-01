@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -231,9 +233,23 @@ public class AppProjectController extends AbstractController {
     public R zabbixHostItemInfo(@RequestParam("itemid") String itemid,
                                 @RequestParam("auth") String auth,
                                 @RequestParam("id") Integer id,
-                                @RequestParam("from") long from,
-                                @RequestParam("till") long till){
-        JSONObject result = appZabbixApiUtils.zabbixGetItemHistory(itemid, auth, id, from, till);
+                                @RequestParam("from") String from,
+                                @RequestParam("till") String till){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
+        Date df = null;
+        Date tf = null;
+        try {
+            df = simpleDateFormat.parse(from);
+            tf = simpleDateFormat.parse(till);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long f = df.getTime() / 1000;
+        long t = tf.getTime() / 1000;
+
+
+        JSONObject result = appZabbixApiUtils.zabbixGetItemHistory(itemid, auth, id, f, t);
 
         return R.ok().put("history",result);
     }

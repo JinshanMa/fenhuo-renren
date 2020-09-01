@@ -87,6 +87,7 @@ public class AppZabbixApiUtils {
                 .paramEntry("time_from", from)
                 .paramEntry("time_till", till)
                 .paramEntry("sortfield", "clock")
+                .paramEntry("limit",30)
                 .auth(auth)
                 .id(id)
                 .build();

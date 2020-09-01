@@ -70,4 +70,5 @@ public class AppFaultdefendController {
         return R.ok();
     }
 
+
 }
