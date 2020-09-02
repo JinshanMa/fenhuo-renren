@@ -118,7 +118,7 @@ public class FenhuoProjectinfoEntity implements Serializable {
 
 	private String creater;
 	/**
-	 * 项目状态: 101未审核 102审核未通过 103激活申请 104激活 105关闭申请 106关闭
+	 * 审批状态 101未审核 102审核未通过 103激活申请 104激活 105关闭申请 106关闭
 	 */
 	private Integer auditstatus;
 
