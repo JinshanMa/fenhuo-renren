@@ -3,7 +3,6 @@ package io.renren.modules.fenhuo.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
-import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,11 +30,11 @@ public interface FenhuoProjectinfoService extends IService<FenhuoProjectinfoEnti
 
     boolean updateProjectInfo(FenhuoProjectinfoEntity projectinfo);
 
-    boolean updateProjectInfoByIds(Collection<? extends Serializable> idList);
+    boolean updateProjectInfoByIds(Collection<? extends Serializable> idList, int status);
 
-    boolean closeProjectInfoByIds(Collection<? extends Serializable> idList);
+//    boolean closeProjectInfoByIds(Collection<? extends Serializable> idList);
 
-    boolean failedProjectInfoByIds(Collection<? extends Serializable> idList);
+//    boolean failedProjectInfoByIds(Collection<? extends Serializable> idList);
 
     List<FenhuoProjectinfoEntity> getProjectinfoByHeadid(String exp);
 

@@ -249,16 +249,42 @@ public class FenhuoProjectinfoController extends AbstractController {
         return R.ok();
     }
 
+
+
+    @RequestMapping("/applyfor/{action}")
+    @RequiresPermissions("fenhuo:proj:applyfor")
+    public R applyforaction(@PathVariable("action") String action, @RequestBody String[] projectids){
+        if(action.equals("active")){
+    //		fenhuoProjectinfoService.removeByIds(Arrays.asList(projectids));
+            fenhuoProjectinfoService.updateProjectInfoByIds(Arrays.asList(projectids), 103);
+        } else if(action.equals("close")){
+            fenhuoProjectinfoService.updateProjectInfoByIds(Arrays.asList(projectids), 105);
+        }
+        return R.ok();
+    }
+
     /**
-     * 激活
+     * 激活 审核通过
      */
     @RequestMapping("/active")
     @RequiresPermissions("fenhuo:fenhuoprojectinfo:active")
     public R active(@RequestBody String[] projectids){
 //		fenhuoProjectinfoService.removeByIds(Arrays.asList(projectids));
-        fenhuoProjectinfoService.updateProjectInfoByIds(Arrays.asList(projectids));
+        fenhuoProjectinfoService.updateProjectInfoByIds(Arrays.asList(projectids), 104);
         return R.ok();
     }
+
+    /**
+     * 审核未通过
+     */
+    @RequestMapping("/faildaudit")
+    @RequiresPermissions("fenhuo:fenhuoprojectinfo:faildaudit")
+    public R audifail(@RequestBody String[] projectids){
+//		fenhuoProjectinfoService.removeByIds(Arrays.asList(projectids));
+        fenhuoProjectinfoService.updateProjectInfoByIds(Arrays.asList(projectids), 102);
+        return R.ok();
+    }
+
 
     /**
      * 关闭
@@ -267,20 +293,20 @@ public class FenhuoProjectinfoController extends AbstractController {
     @RequiresPermissions("fenhuo:fenhuoprojectinfo:active")
     public R close(@RequestBody String[] projectids){
 //		fenhuoProjectinfoService.removeByIds(Arrays.asList(projectids));
-        fenhuoProjectinfoService.closeProjectInfoByIds(Arrays.asList(projectids));
+        fenhuoProjectinfoService.updateProjectInfoByIds(Arrays.asList(projectids), 106);
         return R.ok();
     }
 
-    /**
-     * 关闭
-     */
-    @RequestMapping("/faildaudit")
-    @RequiresPermissions("fenhuo:fenhuoprojectinfo:faildaudit")
-    public R faildaudit(@RequestBody String[] projectids){
-//		fenhuoProjectinfoService.removeByIds(Arrays.asList(projectids));
-        fenhuoProjectinfoService.failedProjectInfoByIds(Arrays.asList(projectids));
-        return R.ok();
-    }
+//    /**
+//     * 关闭
+//     */
+//    @RequestMapping("/faildaudit")
+//    @RequiresPermissions("fenhuo:fenhuoprojectinfo:faildaudit")
+//    public R faildaudit(@RequestBody String[] projectids){
+////		fenhuoProjectinfoService.removeByIds(Arrays.asList(projectids));
+//        fenhuoProjectinfoService.failedProjectInfoByIds(Arrays.asList(projectids));
+//        return R.ok();
+//    }
 
 
 

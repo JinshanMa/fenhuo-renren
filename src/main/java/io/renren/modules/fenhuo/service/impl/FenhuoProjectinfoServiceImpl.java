@@ -13,7 +13,6 @@ import io.renren.modules.sys.service.SysConfigService;
 import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -143,13 +142,22 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     }
 
     @Override
-    public boolean updateProjectInfoByIds(Collection<? extends Serializable> idList) {
+    public boolean updateProjectInfoByIds(Collection<? extends Serializable> idList, int status) {
 
         Iterator iters = idList.iterator();
         while (iters.hasNext()) {
             Long detetingId = Long.parseLong((String) iters.next());
             FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
-            fenhuoProjectinfo.setIsactive(1);
+            if (status == 104) {
+                fenhuoProjectinfo.setIsactive(1);
+            } else if (status == 106) {
+                fenhuoProjectinfo.setIsactive(0);
+            }
+            fenhuoProjectinfo.setAuditstatus(status);
+
+            String audiName = getSysConfig(String.valueOf(status)).getParamValue();
+
+            fenhuoProjectinfo.setAuditname(audiName);
 
             updateById(fenhuoProjectinfo);
         }
@@ -157,30 +165,30 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         return true;
     }
 
-    @Override
-    public boolean closeProjectInfoByIds(Collection<? extends Serializable> idList) {
-        Iterator iters = idList.iterator();
-        while (iters.hasNext()) {
-            Long detetingId = Long.parseLong((String) iters.next());
-            FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
-            fenhuoProjectinfo.setIsactive(0);
-            updateById(fenhuoProjectinfo);
-        }
-        return true;
-    }
+//    @Override
+//    public boolean closeProjectInfoByIds(Collection<? extends Serializable> idList) {
+//        Iterator iters = idList.iterator();
+//        while (iters.hasNext()) {
+//            Long detetingId = Long.parseLong((String) iters.next());
+//            FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
+//            fenhuoProjectinfo.setIsactive(0);
+//            updateById(fenhuoProjectinfo);
+//        }
+//        return true;
+//    }
 
-    @Override
-    public boolean failedProjectInfoByIds(Collection<? extends Serializable> idList) {
-        Iterator iters = idList.iterator();
-        while (iters.hasNext()) {
-            Long detetingId = Long.parseLong((String) iters.next());
-            FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
-            fenhuoProjectinfo.setAuditstatus(103);
-            fenhuoProjectinfo.setAuditname("未审核通过");
-            updateById(fenhuoProjectinfo);
-        }
-        return true;
-    }
+//    @Override
+//    public boolean failedProjectInfoByIds(Collection<? extends Serializable> idList) {
+//        Iterator iters = idList.iterator();
+//        while (iters.hasNext()) {
+//            Long detetingId = Long.parseLong((String) iters.next());
+//            FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
+//            fenhuoProjectinfo.setAuditstatus(103);
+//            fenhuoProjectinfo.setAuditname("未审核通过");
+//            updateById(fenhuoProjectinfo);
+//        }
+//        return true;
+//    }
 
     public List<FenhuoProjectinfoEntity> getProjectinfoByHeadid(String exp){
         return baseMapper.selectProjectinfoByHeaderid(exp);
