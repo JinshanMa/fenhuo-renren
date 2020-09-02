@@ -152,7 +152,7 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
             queryChild.and(wrapper->wrapper.like("roleid", roleid));
         }
         if (StringUtils.isNotBlank(statu)){
-            queryChild.and(wrapper->wrapper.eq("statu",statu));
+            queryChild.and(wrapper->wrapper.eq("status",statu));
         }
 
         if (StringUtils.isNotBlank(keyword)){

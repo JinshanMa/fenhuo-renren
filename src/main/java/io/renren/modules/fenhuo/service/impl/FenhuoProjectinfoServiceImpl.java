@@ -61,7 +61,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String startDate = (String)params.get("startDate");
         String endDate = (String)params.get("endDate");
 
-        QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<FenhuoProjectinfoEntity>();
+        QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<>();
         QueryWrapper<FenhuoProjectinfoEntity> queryChild = (QueryWrapper<FenhuoProjectinfoEntity>)queryWrapper.eq("isdelete", 0);
         if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
             queryChild.and(wrapper->wrapper.ge("date_format(create_time,'%Y-%m-%d')",startDate)
@@ -84,15 +84,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         IPage<FenhuoProjectinfoEntity> page = this.page(
                 new Query<FenhuoProjectinfoEntity>().getPage(params),
                 new QueryWrapper<FenhuoProjectinfoEntity>().eq("isdelete", 0)
-//                        .and(wrapper->{
-//                            if(StringUtils.isNotBlank((String)params.get("headid"))
-//                                    || StringUtils.isNotBlank((String)params.get("partyaid"))
-//                                || StringUtils.isNotBlank((String)params.get("servicemid"))) {
-//                                return wrapper.eq("isactive", 1);
-//                            }else{
-//                                return wrapper.eq("1", "1");
-//                            }
-//                        })
+                //.eq(StringUtils.isNotBlank((String)params.get("auditstatus")))
                 .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))))
                         .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))))
                         .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))))

@@ -166,6 +166,20 @@ public class AppUserController {
 
         fenhuoUsersService.saveOrUpdate(fenhuoUsersEntity);
 
+        //发送短信API
+        YunpianClient clnt = new YunpianClient("2869591b63db6b66495e416eb13a105f").init();
+        Map<String, String> param = clnt.newParam(2);
+        param.put(YunpianClient.MOBILE, fenhuoUsersEntity.getMobile());
+        param.put(YunpianClient.TEXT, "【江民信息】您注册的云桥账号：" + fenhuoUsersEntity.getMobile()  + "审核已通过。");
+        Result<SmsSingleSend> r = clnt.sms().single_send(param);
+        if (r.getCode() == 0){
+
+        }else{
+
+        }
+
+        clnt.close();
+
         return R.ok();
     }
 
@@ -173,7 +187,7 @@ public class AppUserController {
     public R rejectUser(@PathVariable("userid") String userid){
 
         FenhuoUsersEntity fenhuoUsersEntity = fenhuoUsersService.getById(userid);
-        fenhuoUsersEntity.setStatus("1");
+        //fenhuoUsersEntity.setStatus("1");
 
         fenhuoUsersService.removeById(userid);
 
@@ -186,11 +200,14 @@ public class AppUserController {
         Result<SmsSingleSend> r = clnt.sms().single_send(param);
 
         clnt.close();
-        if (r.getCode() == 0){
-            return R.ok();
-        }else{
-            return R.error(500,r.getMsg() + "," + r.getDetail());
-        }
+
+        return R.ok();
+
+//        if (r.getCode() == 0){
+//            return R.ok();
+//        }else{
+//            return R.error(500,r.getMsg() + "," + r.getDetail());
+//        }
     }
 
 
