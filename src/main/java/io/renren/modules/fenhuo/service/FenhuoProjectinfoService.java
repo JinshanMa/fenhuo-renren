@@ -20,6 +20,8 @@ import java.util.Map;
  */
 public interface FenhuoProjectinfoService extends IService<FenhuoProjectinfoEntity> {
 
+    PageUtils queryPageWithParam(Map<String, Object> params);//app筛选使用
+
     PageUtils queryPage(Map<String, Object> params);
 
     PageUtils querySelectedPage(Map<String, Object> params);

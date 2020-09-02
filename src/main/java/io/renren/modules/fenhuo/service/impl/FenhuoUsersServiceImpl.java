@@ -126,6 +126,10 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         String realname = (String)params.get("realname");
 
         String roleid = (String)params.get("roleid");
+        
+        String statu = (String)params.get("statu");
+
+        String keyword = (String)params.get("keyword");
 
         String address = (String)params.get("address");
 
@@ -146,6 +150,14 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         }
         if(StringUtils.isNotBlank(roleid)){
             queryChild.and(wrapper->wrapper.like("roleid", roleid));
+        }
+        if (StringUtils.isNotBlank(statu)){
+            queryChild.and(wrapper->wrapper.eq("statu",statu));
+        }
+
+        if (StringUtils.isNotBlank(keyword)){
+            queryChild.and(wrapper->wrapper.like("mobile",keyword));
+            queryChild.or(wrapper->wrapper.like("realname",keyword));
         }
 
         if(StringUtils.isNotBlank(address)){
@@ -171,7 +183,17 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
 
         fenhuoUser.setPassword(new Sha256Hash("1234567890", salt).toHex());
         fenhuoUser.setSalt(salt);
-        fenhuoUser.setStatus("1");
+        if (fenhuoUser.getStatus() == null){
+            fenhuoUser.setStatus("1");
+        }else{
+            if (fenhuoUser.getStatus().length() == 0 || fenhuoUser.getStatus().equals("")  || fenhuoUser.getStatus().equals("1")){
+                fenhuoUser.setStatus("1");
+            }else{
+                fenhuoUser.setStatus("0");
+            }
+        }
+
+
         this.save(fenhuoUser);
         String roleId = fenhuoUser.getRoleid();
         if(roleId.equals("2")){

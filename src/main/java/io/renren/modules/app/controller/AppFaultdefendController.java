@@ -5,7 +5,6 @@ import io.renren.common.utils.R;
 import io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity;
 import io.renren.modules.fenhuo.service.FenhuoFaultdefendService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -24,7 +23,7 @@ public class AppFaultdefendController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
 
-        PageUtils page = fenhuoFaultdefendService.queryPage(params);
+        PageUtils page = fenhuoFaultdefendService.queryWithStatu(params);
         return R.ok().put("page", page);
 
     }
@@ -45,6 +44,7 @@ public class AppFaultdefendController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody FenhuoFaultdefendEntity fenhuoFaultdefend){
+
 		fenhuoFaultdefendService.save(fenhuoFaultdefend);
 
         return R.ok();
@@ -69,5 +69,6 @@ public class AppFaultdefendController {
 
         return R.ok();
     }
+
 
 }

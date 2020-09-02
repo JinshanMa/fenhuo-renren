@@ -127,6 +127,7 @@ public class SysLoginController extends AbstractController {
 	 */
 	@PostMapping("/sys/logout")
 	public R logout() {
+
 		sysUserTokenService.logout(getUserId());
 		return R.ok();
 	}

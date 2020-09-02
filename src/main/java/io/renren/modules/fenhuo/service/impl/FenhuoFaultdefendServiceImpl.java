@@ -29,6 +29,35 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
     private FenhuoProjectinfoService fenhuoProjectinfoService;
 
     @Override
+    public PageUtils queryWithStatu(Map<String, Object> params) {
+
+        String projectid = (String)params.get("projectid");
+        String statu = (String) params.get("defendresult");
+
+
+        QueryWrapper<FenhuoFaultdefendEntity> queryWrapper = new QueryWrapper<FenhuoFaultdefendEntity>();
+        if (StringUtils.isNotBlank(projectid) && StringUtils.isNotBlank(statu)){
+
+            QueryWrapper<FenhuoFaultdefendEntity> queryChild = (QueryWrapper<FenhuoFaultdefendEntity>)queryWrapper.eq("isdelete", 0);
+
+            queryChild.and(wrapper->wrapper.eq("projectid", projectid));
+
+            queryChild.and(wrapper->wrapper.eq("defendresult", Integer.parseInt(statu)));
+
+        }
+
+
+        IPage<FenhuoFaultdefendEntity> page = this.page(
+                new Query<FenhuoFaultdefendEntity>().getPage(params),
+                queryWrapper
+        );
+
+
+        return new PageUtils(page);
+    }
+
+
+    @Override
     public PageUtils queryPage(Map<String, Object> params) {
 
 //        boolean istrue = StringUtils.isNotBlank(params.get("headid"));

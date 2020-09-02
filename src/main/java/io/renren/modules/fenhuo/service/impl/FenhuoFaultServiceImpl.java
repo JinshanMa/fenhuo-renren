@@ -43,6 +43,57 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Autowired
     private FenhuoUsersService fenhuoUsersService;
 
+    public void saveFault(FenhuoFaultEntity faultEntity){
+        faultEntity.setCreatetime(new Date());
+
+        // 新添加的故障申报默认为  申报成功
+        faultEntity.setFaultstatus(500);
+        String faultstatustxt = getSysConfig(String.valueOf(500));
+        faultEntity.setFaultstatustxt(faultstatustxt);
+
+        save(faultEntity);
+
+
+        String projectid = faultEntity.getProjectid();
+        // 获得项目的维护人ids
+        QueryWrapper<FenhuoProjectinfoEntity> proinfoWrapper = new QueryWrapper<FenhuoProjectinfoEntity>()
+                .eq("projectid", projectid);
+
+        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getOne(proinfoWrapper);
+        String mids = projectinfo.getServicemid();
+        String names = projectinfo.getServicemname();
+
+        FenhuoFaultdefendEntity fenhuoFaultdefendEntity = new FenhuoFaultdefendEntity();
+        fenhuoFaultdefendEntity.setFaultid(faultEntity.getFaultid());
+        fenhuoFaultdefendEntity.setProjectid(Long.parseLong(projectid));
+        fenhuoFaultdefendEntity.setProjectname(projectinfo.getProjectname());
+        fenhuoFaultdefendEntity.setDefenderid(mids);
+        fenhuoFaultdefendEntity.setDefendername(names);
+        fenhuoFaultdefendEntity.setLocationtime(new Date());
+        fenhuoFaultdefendEntity.setPlan("");
+
+        // 申报人姓名
+        fenhuoFaultdefendEntity.setCreaterid(faultEntity.getDeclarer());
+        fenhuoFaultdefendEntity.setCreatername(faultEntity.getDeclarername());
+        fenhuoFaultdefendEntity.setCreatetime(new Date());
+
+        // 初始化维修时间和创建时间一样，前端判断如果和创建时间一样，则显示“维护未开始”
+        fenhuoFaultdefendEntity.setDefendstarttime(new Date());
+        fenhuoFaultdefendEntity.setDefendendtime(new Date());
+
+
+        fenhuoFaultdefendEntity.setFaultdesc(faultEntity.getFaultdesc());
+        fenhuoFaultdefendEntity.setDefendresult(0);
+        fenhuoFaultdefendService.save(fenhuoFaultdefendEntity);
+
+        Map<String,String> extras = new HashMap<>();
+        extras.put("content",faultEntity.getFaultdesc());
+        extras.put("projectId",projectid);
+        extras.put("projectName",projectinfo.getProjectname());
+        extras.put("msgType","extra-msgType");
+        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
+    }
+
     @Override
     public boolean savefenhuofault(FenhuoFaultEntity faultEntity) {
 

@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public interface FenhuoFaultdefendService extends IService<FenhuoFaultdefendEntity> {
 
+    PageUtils queryWithStatu(Map<String, Object> params);
     PageUtils queryPage(Map<String, Object> params);
 
     void removeByIdsBySetIsDeleted(List<Integer> asList);

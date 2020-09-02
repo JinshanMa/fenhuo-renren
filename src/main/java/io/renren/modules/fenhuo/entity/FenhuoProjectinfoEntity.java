@@ -53,7 +53,7 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	 */
 	private Date projectcreatetime;
 	/**
-	 * 
+	 *
 	 */
 	private String effectivetime;
 	/**
