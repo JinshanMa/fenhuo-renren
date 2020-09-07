@@ -18,19 +18,11 @@ import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
 import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
-import io.renren.modules.fenhuo.utils.OpUtils;
-import io.renren.modules.fenhuo.utils.ProjectRelatedfileObj;
 import io.renren.modules.fenhuo.utils.ZabbixApiUtils;
 import io.renren.modules.sys.controller.AbstractController;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -91,19 +83,33 @@ public class AppProjectController extends AbstractController {
         return R.ok().put("page", page);
     }
 
+
+    @Login
+    @RequestMapping("/reject/apply")
+    public R rejectApplyProject(@RequestParam Map<String,Object> param){
+
+        String projectid = (String)param.get("projectid");
+        return  operateProject(projectid,102);
+
+    }
+
+
     @Login
     @RequestMapping("/active")
     public R activeProject(@RequestParam Map<String,Object> param){
 
         String projectid = (String)param.get("projectid");
-        if (StringUtils.isNotBlank(projectid)){
-            ArrayList<String> ids = new ArrayList<String>();
-            ids.add(projectid);
-            fenhuoProjectinfoService.updateProjectInfoByIds(ids);
-            return R.ok();
-        }else{
-            return R.error(500,"参数错误");
-        }
+        return  operateProject(projectid,104);
+
+    }
+
+    @Login
+    @RequestMapping("/apply/active")
+    public R applyActiveProject(@RequestParam Map<String,Object> param){
+
+        String projectid = (String)param.get("projectid");
+        return  operateProject(projectid,103);
+
     }
 
     @Login
@@ -111,14 +117,52 @@ public class AppProjectController extends AbstractController {
     public R closeProject(@RequestParam Map<String,Object> param){
 
         String projectid = (String)param.get("projectid");
+        return  operateProject(projectid,106);
+
+    }
+
+    @Login
+    @RequestMapping("/apply/close")
+    public R applyCloseProject(@RequestParam Map<String,Object> param){
+
+        String projectid = (String)param.get("projectid");
+        return  operateProject(projectid,105);
+
+    }
+
+    @Login
+    @RequestMapping("/reapply")
+    public R reapply(@RequestParam Map<String,Object> param){
+
+        String projectid = (String)param.get("projectid");
+        return  operateProject(projectid,101);
+
+    }
+
+
+    private R operateProject(String projectid,int statu){
         if (StringUtils.isNotBlank(projectid)){
             ArrayList<String> ids = new ArrayList<String>();
             ids.add(projectid);
-            fenhuoProjectinfoService.closeProjectInfoByIds(ids);
+            fenhuoProjectinfoService.updateProjectInfoByIds(ids,statu);
             return R.ok();
         }else{
             return R.error(500,"参数错误");
         }
+    }
+
+    @Login
+    @RequestMapping("/delete")
+    public R delete(@RequestParam Map<String,Object> param){
+
+        String projectid = (String)param.get("projectid");
+        boolean isDelete = fenhuoUsersService.isDeleteByIds(Arrays.asList(projectid));
+        if (isDelete){
+            return R.ok();
+        }else{
+            return R.error();
+        }
+
     }
 
 
@@ -168,18 +212,28 @@ public class AppProjectController extends AbstractController {
         FenhuoZabbixhostEntity fenhuoZabbixhost = fenhuoProjectinfoReq.getZabbixhost();
 
 
-        boolean proInfoIsOk = fenhuoProjectinfoService.saveProjectInfo(fenhuoProjectinfo);
-        if(proInfoIsOk){
-
+        boolean isOk = fenhuoProjectinfoService.saveProjectInfo(fenhuoProjectinfo);
+        if(isOk){
             fenhuoZabbixhost.setProjectid(fenhuoProjectinfo.getProjectid());
             fenhuoZabbixhost.setProjectname(fenhuoProjectinfo.getProjectname());
             fenhuoZabbixhost.setIsdeleted(0);
-
             fenhuoZabbixhostService.save(fenhuoZabbixhost);
         }
         return R.ok();
 
     }
+
+
+    @Login
+    @RequestMapping("update")
+    public R update(@RequestBody FenhuoProjectinfoRequest fenhuoProjectinfoReq) {
+
+        fenhuoProjectinfoService.updateProjectInfo(fenhuoProjectinfoReq.getProjectinfo());
+        fenhuoZabbixhostService.updateById(fenhuoProjectinfoReq.getZabbixhost());
+
+        return R.ok();
+    }
+
 
 
 
@@ -271,127 +325,6 @@ public class AppProjectController extends AbstractController {
 
 
 
-//    @PostMapping("/upload/{projectid}")
-//    public R uploadRelatedFile(@PathVariable("projectid") String projectid,
-//                               @RequestParam("deleteFiles") String[] delFilenames,
-//                               @RequestParam("files") MultipartFile[] files){
-////        System.out.println("delFilenames.length:" + delFilenames.length);
-//        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
-//        String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + OpUtils.getBacklash();
-//
-//        // 如果 待删除的文件长度大于零表示有文件需要删除
-//        if (delFilenames.length > 0){
-//            List<String> totalpaths = new ArrayList<String>(Arrays.asList(projectinfo.getFileurl().split(OpUtils.getSplitNotation())));
-//            for (String deletingFilename: delFilenames){
-//                String absolutefilepath = projectFileDir + deletingFilename;
-//                File file = new File(absolutefilepath);
-//                if(file.exists()){
-//                    file.delete();
-//                }
-//                for (String path: totalpaths){
-//                    if (path.equals(absolutefilepath)){
-//                        totalpaths.remove(path);
-//                        break;
-//                    }
-//                }
-//            }
-//            projectinfo.setFileurl(String.join(OpUtils.getSplitNotation(),totalpaths));
-//            fenhuoProjectinfoService.updateById(projectinfo);
-//
-//        }
-//        for (MultipartFile file : files) {
-//            if (file.isEmpty()) {
-//                return R.error("filename is empty");
-//            }
-//
-//
-//            String fileName = file.getOriginalFilename();
-//
-//            String destPath = uploadFileConfig.getLocaluploadpath();
-//            System.out.println("---------projectid: " + projectid + "-----UploadFileConfig.getLocaluploadpath():" + uploadFileConfig.getLocaluploadpath());
-//
-////            FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
-////            String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
-//
-//            File projectUploadFileDir = new File(projectFileDir);
-//            if (!projectUploadFileDir.exists()) {
-//                boolean ok = projectUploadFileDir.mkdir();
-//                if (!ok) {
-//                    return R.error().put("msg", "project Upload directory can not create!");
-//                }
-//            }
-//
-//            File dest = new File(projectFileDir + fileName);
-//            try {
-//                file.transferTo(dest);
-//                String fullpath = dest.getAbsolutePath();
-//                String orinalUrls = projectinfo.getFileurl();
-//                List<String> urls;
-//                if (StringUtils.isNotBlank(orinalUrls)) {
-//                    List<String> arrayList = Arrays.asList(orinalUrls.split(OpUtils.getSplitNotation()));
-//                    urls = new ArrayList(arrayList);
-//                    System.out.println("---isNotBlank---:" + urls);
-//                } else {
-//                    urls = new ArrayList<String>();
-//                    System.out.println("---isBlank---");
-//                }
-//                System.out.println("before finalfullpath++++++++----:" + String.join(OpUtils.getSplitNotation(), urls));
-//                urls.add(fullpath);
-//                String finalFullPath = String.join(OpUtils.getSplitNotation(), urls);
-//                System.out.println("after finalfullpath++++++++------:" + finalFullPath);
-//                projectinfo.setFileurl(finalFullPath);
-//                fenhuoProjectinfoService.updateById(projectinfo);
-////            LOGGER.info("上传成功");
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-////            LOGGER.error(e.toString(), e);
-//            }
-//        }
-//        return R.ok();
-//
-//    }
-//
-//    @GetMapping("/download")
-//    public void downloadFile(HttpServletRequest request, HttpServletResponse res) {
-//        fenhuoProjectinfoService.relatedFileDownload(request, res);
-//    }
-//
-//    @RequestMapping("/projectfilelist/{projectid}")
-//    public R listProjectfile(@PathVariable("projectid") String projectid){
-//        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
-//        String fileurls = projectinfo.getFileurl();
-//        List<ProjectRelatedfileObj> filenames = new ArrayList<ProjectRelatedfileObj>();
-//        if(StringUtils.isNotBlank(fileurls)) {
-//            String[] files = fileurls.split(OpUtils.getSplitNotation());
-//            List<String> filelist = new ArrayList<String>(Arrays.asList(files));
-//
-//            for (String file : filelist) {
-//                int index = file.lastIndexOf(OpUtils.getBacklash());
-//                ProjectRelatedfileObj fileobj = new ProjectRelatedfileObj();
-//                fileobj.setUid(String.valueOf(file.hashCode()));
-//                fileobj.setName(file.substring(index+1));
-//                filenames.add(fileobj);
-//            }
-//        }
-//
-//        return R.ok().put("relatedfilelist", filenames);
-//
-//    }
-
-
-
 }
-
-//
-//    CREATE TABLE `fenhuo_projectfile` (
-//        `fileid` bigint NOT NULL AUTO_INCREMENT,
-//        `projectid` int NOT NULL COMMENT '项目id',
-//        `filename` varchar(50) COMMENT '文件名',
-//        `filepath` varchar(200) COMMENT '文件路径',
-//        `filetype` varchar(20) COMMENT '文件类型',
-//        `filesize` bigint COMMENT '文件大小',
-//        PRIMARY KEY (`fileid`)
-//        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目附件';
 
 

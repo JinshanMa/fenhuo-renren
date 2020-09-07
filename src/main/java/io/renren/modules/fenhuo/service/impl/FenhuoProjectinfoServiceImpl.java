@@ -6,6 +6,7 @@ import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoProjectfileService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
+import io.renren.modules.fenhuo.utils.JGPushUtil;
 import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
@@ -129,6 +130,31 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     public boolean saveProjectInfo(FenhuoProjectinfoEntity projectinfo) {
         if (projectinfo != null){
 //            processRequestObj(projectinfo);
+            if (projectinfo.getHeadid() != null && projectinfo.getHeadname() != null){
+                if (projectinfo.getAuditstatus() == 101){
+                    String[] headids = projectinfo.getHeadid().split(",");
+                    String[] headnames = projectinfo.getHeadname().split(",");
+                    FenhuoUsersEntity userHead = fenhuoUsersService.queryByUserId(headids[0]);
+                    //JGPushUtil.pushMsgByRegID()
+
+                    //通知所有系统管理员
+                    List<SysUserEntity> sysUsers = sysUserService.list();
+                    for (SysUserEntity sysUserEntity: sysUsers){
+                        if (sysUserEntity.getPushid() != null){
+                            if (headnames.length > 0){
+                                String title = headnames[0] + "申请创建项目";
+                                String content = "项目管理员:" + headnames[0] + ",申请创建项目：" + projectinfo.getProjectname();
+                                JGPushUtil.pushMsgByRegID(sysUserEntity.getPushid(),title,content,null);
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+
             projectinfo.setIsactive(0);
             save(processRequestObj(projectinfo));
             return true;
@@ -368,4 +394,12 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         }
     }
 
+
+    public static void main(String[] args) {
+        OpUtils opUtils = new OpUtils();
+        String projuploadir = opUtils.getPath() + new UploadFileConfig().getLocaluploadpath();
+        System.out.println(projuploadir);
+
+    }
 }
+
