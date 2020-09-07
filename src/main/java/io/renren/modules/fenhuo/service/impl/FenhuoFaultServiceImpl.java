@@ -111,6 +111,8 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         Date faultStarttime = faultEntity.getStarttime();
         if (faultStarttime == null){
             faultEntity.setStarttime(new Date());
+        }else{
+            faultEntity.setStarttime(faultStarttime);
         }
 
         save(faultEntity);
@@ -151,8 +153,8 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         Date iniDate = new Date();
 
         fenhuoFaultdefend.setCreatetime(iniDate);
-        fenhuoFaultdefend.setDefendstarttime(iniDate);
-        fenhuoFaultdefend.setDefendendtime(iniDate);
+        fenhuoFaultdefend.setDefendstarttime(faultStarttime);
+        fenhuoFaultdefend.setDefendendtime(faultStarttime);
 
 
 
