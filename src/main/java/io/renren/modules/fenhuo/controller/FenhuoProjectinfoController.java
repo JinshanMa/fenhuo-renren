@@ -319,7 +319,7 @@ public class FenhuoProjectinfoController extends AbstractController {
         String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
 
 //        System.out.println("delFilenames.length:" + delFilenames.length);
-        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
+//        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
 
         QueryWrapper<FenhuoProjectfileEntity> queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>()
                 .eq("projectid", Integer.valueOf(projectid));

@@ -6,6 +6,8 @@ import io.renren.modules.fenhuo.entity.FenhuoFaultEntity;
 import io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,5 +35,7 @@ public interface FenhuoFaultService extends IService<FenhuoFaultEntity> {
     void validfail(String faultid);
 
     void noideamaintain(String faultid);
+
+    void relatedFileDownload(HttpServletRequest request, HttpServletResponse res);
 }
 

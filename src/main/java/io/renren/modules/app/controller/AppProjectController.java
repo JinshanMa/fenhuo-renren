@@ -91,35 +91,35 @@ public class AppProjectController extends AbstractController {
         return R.ok().put("page", page);
     }
 
-    @Login
-    @RequestMapping("/active")
-    public R activeProject(@RequestParam Map<String,Object> param){
+//    @Login
+//    @RequestMapping("/active")
+//    public R activeProject(@RequestParam Map<String,Object> param){
+//
+//        String projectid = (String)param.get("projectid");
+//        if (StringUtils.isNotBlank(projectid)){
+//            ArrayList<String> ids = new ArrayList<String>();
+//            ids.add(projectid);
+//            fenhuoProjectinfoService.updateProjectInfoByIds(ids);
+//            return R.ok();
+//        }else{
+//            return R.error(500,"参数错误");
+//        }
+//    }
 
-        String projectid = (String)param.get("projectid");
-        if (StringUtils.isNotBlank(projectid)){
-            ArrayList<String> ids = new ArrayList<String>();
-            ids.add(projectid);
-            fenhuoProjectinfoService.updateProjectInfoByIds(ids);
-            return R.ok();
-        }else{
-            return R.error(500,"参数错误");
-        }
-    }
-
-    @Login
-    @RequestMapping("/close")
-    public R closeProject(@RequestParam Map<String,Object> param){
-
-        String projectid = (String)param.get("projectid");
-        if (StringUtils.isNotBlank(projectid)){
-            ArrayList<String> ids = new ArrayList<String>();
-            ids.add(projectid);
-            fenhuoProjectinfoService.closeProjectInfoByIds(ids);
-            return R.ok();
-        }else{
-            return R.error(500,"参数错误");
-        }
-    }
+//    @Login
+//    @RequestMapping("/close")
+//    public R closeProject(@RequestParam Map<String,Object> param){
+//
+//        String projectid = (String)param.get("projectid");
+//        if (StringUtils.isNotBlank(projectid)){
+//            ArrayList<String> ids = new ArrayList<String>();
+//            ids.add(projectid);
+//            fenhuoProjectinfoService.closeProjectInfoByIds(ids);
+//            return R.ok();
+//        }else{
+//            return R.error(500,"参数错误");
+//        }
+//    }
 
 
     @Login
