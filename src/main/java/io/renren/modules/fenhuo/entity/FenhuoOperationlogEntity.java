@@ -37,6 +37,7 @@ public class FenhuoOperationlogEntity implements Serializable {
 	 */
 	private String opersoname;
 	/**
+	 *
 	 * 操作名称
 	 */
 	private String opname;

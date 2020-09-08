@@ -32,6 +32,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private LoginUserHandlerMethodArgumentResolver loginUserHandlerMethodArgumentResolver;
 
+    @Autowired
+    private UploadFileConfig uploadFileConfig;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor).addPathPatterns("/app/**");
@@ -45,8 +48,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String path = uploadFileConfig.getLocaluploadpath();
+        System.out.println("===============" + path + "================");
         /** 图片传路径 */
-        registry.addResourceHandler("/uploadfile/**").addResourceLocations("file:" + new UploadFileConfig().getLocaluploadpath());
+        registry.addResourceHandler("/doc/**").addResourceLocations("file:fileupload/");///Users/aodadou/Desktop/fenghuo/fenhuo-renren/
 
     }
 

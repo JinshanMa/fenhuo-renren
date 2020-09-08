@@ -19,6 +19,8 @@ public interface FenhuoOperationlogService extends IService<FenhuoOperationlogEn
 
     PageUtils queryPage(Map<String, Object> params);
 
+    void saveAppOpByParamThroughAspect(Long userid, Object[] paramsObj, String opname);
+
     void saveOpByParamThroughAspect(Long userid, Object[] params, String opname);
 
     boolean isDeleteByIds(Collection<? extends Serializable> idList);
