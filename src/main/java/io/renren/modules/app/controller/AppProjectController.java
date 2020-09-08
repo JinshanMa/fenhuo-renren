@@ -99,6 +99,12 @@ public class AppProjectController extends AbstractController {
     public R activeProject(@RequestParam Map<String,Object> param){
 
         String projectid = (String)param.get("projectid");
+
+        FenhuoProjectinfoEntity projectinfoEntity = fenhuoProjectinfoService.getById(projectid);
+        if (projectinfoEntity != null){
+
+        }
+
         return  operateProject(projectid,104);
 
     }
