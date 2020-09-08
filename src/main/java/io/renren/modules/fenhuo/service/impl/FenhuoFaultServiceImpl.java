@@ -1,15 +1,16 @@
 package io.renren.modules.fenhuo.service.impl;
 
-import io.renren.modules.fenhuo.entity.FenhuoFaultdefendEntity;
-import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
-import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
+import io.renren.config.UploadFileConfig;
+import io.renren.modules.fenhuo.entity.*;
 import io.renren.modules.fenhuo.service.*;
+import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.service.SysConfigService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -19,7 +20,9 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 
 import io.renren.modules.fenhuo.dao.FenhuoFaultDao;
-import io.renren.modules.fenhuo.entity.FenhuoFaultEntity;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 @Service("fenhuoFaultService")
@@ -42,6 +45,13 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
     @Autowired
     private FenhuoUsersService fenhuoUsersService;
+
+    @Autowired
+    private UploadFileConfig uploadFileConfig;
+
+    @Autowired
+    private FenhuoProjectfileService fenhuoProjectfileService;
+
 
     public void saveFault(FenhuoFaultEntity faultEntity){
         faultEntity.setCreatetime(new Date());
@@ -335,4 +345,67 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
         return "\""+tempContent+"\"";
     }
+
+
+    @Override
+    public void relatedFileDownload(HttpServletRequest request, HttpServletResponse res) {
+//        ApplicationHome applicationHome = new ApplicationHome(getClass());
+//        File jarFile = applicationHome.getSource();
+//        String path = jarFile.getParentFile().toString();
+//        path += "/pattern/excel/";
+
+        String prjid = request.getParameter("faultid");
+
+//        FenhuoFaultEntity projectinfo = getById(Long.valueOf(prjid));
+
+//        String path = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + "/";
+        OpUtils opUtils = new OpUtils();
+        String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
+
+        QueryWrapper<FenhuoProjectfileEntity> queryWrapper = new  QueryWrapper<FenhuoProjectfileEntity>()
+                .eq("projectid", Integer.valueOf(prjid));
+
+        FenhuoProjectfileEntity file = fenhuoProjectfileService.list(queryWrapper).get(0);
+
+        String path = projuploadir + file.getFilepath();
+        String fileName = request.getParameter("fileName");
+        String filePath = path + fileName;
+        File excelFile = new File(filePath);
+        res.setCharacterEncoding("UTF-8");
+        res.setHeader("content-type", "application/octet-stream;charset=UTF-8");
+        res.setContentType("application/octet-stream;charset=UTF-8");
+        //加上设置大小下载下来的.xlsx文件打开时才不会报“Excel 已完成文件级验证和修复。此工作簿的某些部分可能已被修复或丢弃”
+        res.addHeader("Content-Length", String.valueOf(excelFile.length()));
+        try {
+            res.setHeader("Content-Disposition", "attachment;filename=" + java.net.URLEncoder.encode(fileName.trim(), "UTF-8"));
+        } catch (UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+        }
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = res.getOutputStream();
+            bis = new BufferedInputStream(new FileInputStream(new File(filePath)));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+//                    log.error("【下载模板】{}",e);
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
 }

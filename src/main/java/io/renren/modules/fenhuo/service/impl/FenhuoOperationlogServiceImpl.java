@@ -215,8 +215,28 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
                 oplog.setProjectname(projectinfo.getProjectname());
                 save(oplog);
             }
-        }
+        }else if(opname.equals("applyforaction")){
 
+
+            String action = (String)paramsObj[0];
+            String[] projectids = (String[])paramsObj[1];
+
+//            List<String> list = Arrays.asList(projectids);
+            for(String projid:projectids){
+                FenhuoOperationlogEntity oplog = aspectCommonProcess(userid);
+                if(action.equals("active")){
+                    oplog.setOpname("申请激活项目");
+                }else if(action.equals("close")){
+                    oplog.setOpname("申请关闭项目");
+                }
+                oplog.setIsdelete(0);
+                oplog.setProjectid(Long.valueOf(projid));
+//                oplog.setProjectname();
+                save(oplog);
+            }
+
+
+        }
     }
 
     @Override
