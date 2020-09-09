@@ -52,7 +52,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Autowired
     private FenhuoProjectfileService fenhuoProjectfileService;
 
-
+    //web
     public void saveFault(FenhuoFaultEntity faultEntity){
         faultEntity.setCreatetime(new Date());
 
@@ -77,6 +77,8 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         fenhuoFaultdefendEntity.setFaultid(faultEntity.getFaultid());
         fenhuoFaultdefendEntity.setProjectid(Long.parseLong(projectid));
         fenhuoFaultdefendEntity.setProjectname(projectinfo.getProjectname());
+        fenhuoFaultdefendEntity.setHostname(faultEntity.getHostname());
+        fenhuoFaultdefendEntity.setHostid(faultEntity.getHostid());
         fenhuoFaultdefendEntity.setDefenderid(mids);
         fenhuoFaultdefendEntity.setDefendername(names);
         fenhuoFaultdefendEntity.setLocationtime(new Date());
@@ -94,6 +96,22 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
         fenhuoFaultdefendEntity.setFaultdesc(faultEntity.getFaultdesc());
         fenhuoFaultdefendEntity.setDefendresult(0);
+        String declarer = faultEntity.getDeclarer();
+        FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(declarer);
+        //申报人是维护人员的话状态就为1
+        if (usersEntity != null){
+            if (usersEntity.getRoleid().equals("3")){
+                fenhuoFaultdefendEntity.setDefendresult(1);
+                fenhuoFaultdefendService.save(fenhuoFaultdefendEntity);
+                Map<String,String> extras = new HashMap<>();
+                extras.put("content","正在维护：" + faultEntity.getFaultdesc());
+                extras.put("projectId",projectid);
+                extras.put("projectName",projectinfo.getProjectname());
+                extras.put("msgType","extra-msgType");
+                jGPushService.notifyHeader(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
+                return;
+            }
+        }
         fenhuoFaultdefendService.save(fenhuoFaultdefendEntity);
 
         Map<String,String> extras = new HashMap<>();
@@ -104,6 +122,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
     }
 
+    //app
     @Override
     public boolean savefenhuofault(FenhuoFaultEntity faultEntity) {
 
@@ -147,6 +166,8 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
         fenhuoFaultdefend.setProjectid(Long.valueOf(projectid));
         fenhuoFaultdefend.setFaultid(faultEntity.getFaultid());
+        fenhuoFaultdefend.setHostname(faultEntity.getHostname());
+        fenhuoFaultdefend.setHostid(faultEntity.getHostid());
 
         // 维护人id 和 姓名
 
@@ -173,6 +194,25 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
         // 未开始维护
         fenhuoFaultdefend.setDefendresult(0);
+
+        String declarer = faultEntity.getDeclarer();
+        FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(declarer);
+        //申报人是维护人员的话状态就为1
+        if (usersEntity != null){
+            if (usersEntity.getRoleid().equals("3")){
+                fenhuoFaultdefend.setDefendresult(1);
+                fenhuoFaultdefendService.save(fenhuoFaultdefend);
+                Map<String,String> extras = new HashMap<>();
+                extras.put("content","正在维护：" + faultEntity.getFaultdesc());
+                extras.put("projectId",projectid);
+                extras.put("projectName",projectinfo.getProjectname());
+                extras.put("msgType","extra-msgType");
+                jGPushService.notifyHeader(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
+                return true;
+            }
+        }
+
+
         fenhuoFaultdefendService.save(fenhuoFaultdefend);
         /////////////////////////////////////////////////////
 

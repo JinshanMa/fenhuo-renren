@@ -116,6 +116,7 @@ public class JGPushServiceImpl implements IJGPushService {
                     pushlog.setPushtitle(title);
                     pushlog.setPushtxt(content);
                     pushlog.setPushtime(new Date());
+                    pushlog.setUserid(user.getUserId());
                     boolean insert = fenhuoPushlogService.save(pushlog);
                     logger.info("给维护人员推送通知，添加推送日志结果："+insert);
 

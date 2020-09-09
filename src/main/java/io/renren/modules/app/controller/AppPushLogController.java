@@ -1,13 +1,19 @@
 package io.renren.modules.app.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.fenhuo.entity.FenhuoPushlogEntity;
+import io.renren.modules.fenhuo.entity.FenhuoZabbixhostEntity;
 import io.renren.modules.fenhuo.service.FenhuoPushlogService;
+import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,6 +21,9 @@ import java.util.Map;
 public class AppPushLogController {
     @Autowired
     private FenhuoPushlogService fenhuoPushlogService;
+
+    @Autowired
+    private FenhuoZabbixhostService fenhuoZabbixhostService;
 
     /**
      * 列表
@@ -63,6 +72,24 @@ public class AppPushLogController {
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids){
         fenhuoPushlogService.removeByIds(Arrays.asList(ids));
+
+        return R.ok();
+    }
+
+    @RequestMapping("/zabbixAlert")
+    public R zabbixAlert(@RequestParam("sendto") String sendto,@RequestParam("subject") String subject,@RequestParam("message") String message){
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("zbusername",sendto);
+        PageUtils page = fenhuoZabbixhostService.queryPage(map);
+        if (page.getList().size() > 0){
+            List<FenhuoZabbixhostEntity> zabbixhostEntities = (List<FenhuoZabbixhostEntity>)page.getList();
+            FenhuoZabbixhostEntity zabbixhostEntity = zabbixhostEntities.get(0);
+
+        }
+
+
+        System.out.println("sendto" + sendto + " subject:" + subject + " message:" + message);
 
         return R.ok();
     }

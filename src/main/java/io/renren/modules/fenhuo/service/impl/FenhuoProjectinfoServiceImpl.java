@@ -197,8 +197,10 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
             FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
             if (status == 104) {
                 fenhuoProjectinfo.setIsactive(1);
+                fenhuoProjectinfo.setRecentactivetime(new Date());
             } else if (status == 106) {
                 fenhuoProjectinfo.setIsactive(0);
+                fenhuoProjectinfo.setRecentclosetime(new Date());
             }
             fenhuoProjectinfo.setAuditstatus(status);
 
@@ -260,8 +262,11 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String partyaid = String.valueOf(projectinfo.getPartyaid());
         String servicemid = String.valueOf(projectinfo.getServicemid());
 
+        String serviceName = "";
+        if (!serviceId.equals("0")){
+            serviceName = getSysConfig(serviceId).getParamValue();
+        }
 
-        String serviceName = getSysConfig(serviceId).getParamValue();
         String taskName = getSysConfig(taskid).getParamValue();
         String audiName = getSysConfig(auditStatus).getParamValue();
 
@@ -270,7 +275,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String serviceMName = convertToStringName(getUsersMsg(servicemid));
 
 
-        projectinfo.setServiceditemetail(serviceName);
+        projectinfo.setServiceditemetail(projectinfo.getServiceditemetail());
         projectinfo.setTaskname(taskName);
         projectinfo.setHeadname(headNames);
         projectinfo.setPartyaname(partyAName);

@@ -27,9 +27,12 @@ public class FenhuoZabbixhostServiceImpl extends ServiceImpl<FenhuoZabbixhostDao
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+
+        String zbusername = (String)params.get("zbusername");
+
         IPage<FenhuoZabbixhostEntity> page = this.page(
                 new Query<FenhuoZabbixhostEntity>().getPage(params),
-                new QueryWrapper<FenhuoZabbixhostEntity>()
+                new QueryWrapper<FenhuoZabbixhostEntity>().eq("zbusername",zbusername)
         );
 
         return new PageUtils(page);

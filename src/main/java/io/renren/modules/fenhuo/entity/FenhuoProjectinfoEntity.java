@@ -161,12 +161,12 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	/**
 	 * 项目类型
 	 */
-	private Integer projectype;
+	private String projectype;
 
 	/**
-	 * 项目类型id
+	 * 项目类型名称
 	 */
-	private String projectypeid;
+	private Integer projectypeid;
 
 	/**
 	 * 最近一次关闭时间

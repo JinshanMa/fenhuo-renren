@@ -96,4 +96,8 @@ public class FenhuoFaultdefendEntity implements Serializable {
 	 */
 	private int isdelete;
 
+	private String hostname;
+
+	private String hostid;
+
 }

@@ -11,6 +11,7 @@
         <result property="pushtitle" column="pushtitle"/>
         <result property="pushtxt" column="pushtxt"/>
         <result property="pushtime" column="pushtime"/>
+        <result property="userid" column="userid"/>
     </resultMap>
 
 

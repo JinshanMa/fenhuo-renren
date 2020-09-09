@@ -45,4 +45,6 @@ public class FenhuoPushlogEntity implements Serializable {
 	 */
 	private Date pushtime;
 
+	private Long userid;
+
 }
