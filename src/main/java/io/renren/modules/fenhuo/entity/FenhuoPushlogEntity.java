@@ -47,4 +47,9 @@ public class FenhuoPushlogEntity implements Serializable {
 
 	private Long userid;
 
+	/**
+	 * 推送类型  1.项目推送   2.故障推送   3.zabbix推送
+	 */
+	private Integer pushtype;
+
 }

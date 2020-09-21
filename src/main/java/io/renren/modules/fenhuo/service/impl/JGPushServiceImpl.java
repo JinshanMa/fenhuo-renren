@@ -152,6 +152,7 @@ public class JGPushServiceImpl implements IJGPushService {
                         FenhuoPushlogEntity pushlog = new FenhuoPushlogEntity();
                         pushlog.setProjectid(Long.valueOf(projectId));
                         pushlog.setPushid(user.getPushid());
+                        pushlog.setUserid(user.getUserid());
                         pushlog.setPushtitle(title);
                         pushlog.setPushtxt(content);
                         pushlog.setPushtime(new Date());

@@ -129,8 +129,10 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         faultEntity.setCreatetime(new Date());
 
         // 设置故障类型名称
-        String faultname = getSysConfig(String.valueOf(faultEntity.getFaulttype()));
-        faultEntity.setFaulttypename(faultname);
+        if (faultEntity.getFaulttype() != 0){
+            String faultname = getSysConfig(String.valueOf(faultEntity.getFaulttype()));
+            faultEntity.setFaulttypename(faultname);
+        }
 
         // 新添加的故障申报默认为  申报成功
         faultEntity.setFaultstatus(500);
@@ -222,7 +224,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         extras.put("projectName",projectname);
         extras.put("msgType","extra-msgType");
 
-        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, extras, null, null);
+        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultEntity.getFaulttypename(), extras, null, null);
 
         return true;
     }

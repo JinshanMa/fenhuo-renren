@@ -81,15 +81,53 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+
+        String keyword = (String)params.get("keyword");
+        String startDate = (String)params.get("startDate");
+        String endDate = (String)params.get("endDate");
+        String headid = (String)params.get("headid");
+        String partyaid = (String)params.get("partyaid");
+        String servicemid = (String)params.get("servicemid");
+
+        QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<FenhuoProjectinfoEntity> queryChild = (QueryWrapper<FenhuoProjectinfoEntity>)queryWrapper.eq("isdelete", 0);
+
+        if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
+            queryChild.and(wrapper->wrapper.ge("date_format(create_time,'%Y-%m-%d')",startDate)
+                    .le("date_format(create_time,'%Y-%m-%d')", endDate));
+        }
+        if (StringUtils.isNotBlank(keyword)){
+            queryChild.and(wrapper->wrapper.like("projectname", keyword));
+        }
+
+        if (StringUtils.isNotBlank(headid)){
+            queryChild.and(wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))));
+        }
+
+        if (StringUtils.isNotBlank(partyaid)){
+            queryChild.and(wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))));
+        }
+
+        if (StringUtils.isNotBlank(servicemid)){
+            queryChild.and(wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))));
+        }
+
         IPage<FenhuoProjectinfoEntity> page = this.page(
                 new Query<FenhuoProjectinfoEntity>().getPage(params),
-                new QueryWrapper<FenhuoProjectinfoEntity>().eq("isdelete", 0)
-                //.eq(StringUtils.isNotBlank((String)params.get("auditstatus")))
-                .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))))
-                        .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))))
-                        .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))))
-
+                queryWrapper
         );
+
+        //        IPage<FenhuoProjectinfoEntity> page = this.page(
+//                new Query<FenhuoProjectinfoEntity>().getPage(params),
+//                new QueryWrapper<FenhuoProjectinfoEntity>().eq("isdelete", 0)
+//                //.eq(StringUtils.isNotBlank((String)params.get("auditstatus")))
+//                .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))))
+//                        .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))))
+//                        .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))))
+//
+//        );
+
+
         return new PageUtils(page);
     }
 

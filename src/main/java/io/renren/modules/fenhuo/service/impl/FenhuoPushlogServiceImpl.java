@@ -1,5 +1,7 @@
 package io.renren.modules.fenhuo.service.impl;
 
+import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,9 +20,20 @@ public class FenhuoPushlogServiceImpl extends ServiceImpl<FenhuoPushlogDao, Fenh
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+
+
+        String userid = (String)params.get("userid");
+
+        QueryWrapper<FenhuoPushlogEntity> queryWrapper = new QueryWrapper<>();
+
+        if (StringUtils.isNotBlank(userid)){
+            queryWrapper.and(wrapper->wrapper.eq("userid", userid));
+        }
+        queryWrapper.orderByDesc("pushtime");
+
         IPage<FenhuoPushlogEntity> page = this.page(
                 new Query<FenhuoPushlogEntity>().getPage(params),
-                new QueryWrapper<FenhuoPushlogEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);
