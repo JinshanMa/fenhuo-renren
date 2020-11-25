@@ -45,9 +45,9 @@ public class AppFaultdefendController {
     @RequestMapping("/save")
     public R save(@RequestBody FenhuoFaultdefendEntity fenhuoFaultdefend){
 
-		fenhuoFaultdefendService.save(fenhuoFaultdefend);
+        fenhuoFaultdefendService.save(fenhuoFaultdefend);
 
-        return R.ok();
+        return R.ok();//.put("id",fenhuoFaultdefend.getFaultid())
     }
 
     /**

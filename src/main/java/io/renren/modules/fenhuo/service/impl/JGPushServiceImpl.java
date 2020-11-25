@@ -103,7 +103,7 @@ public class JGPushServiceImpl implements IJGPushService {
         queryWrapper.ne("username", "admin");
         List<SysUserEntity> fenghuoUsers = sysUserService.list(queryWrapper);
         String projectId = (String)extras.get("projectId");
-//        FenhuoProjectinfoEntity projectInfo = getProjectInfo(projectId,title,content);
+        FenhuoProjectinfoEntity projectInfo = getProjectInfo(projectId,title,content);
 
         for (SysUserEntity user : fenghuoUsers){
             if (StringUtils.isNotBlank(user.getPushid())) {
@@ -112,6 +112,7 @@ public class JGPushServiceImpl implements IJGPushService {
                 if (b){
                     FenhuoPushlogEntity pushlog = new FenhuoPushlogEntity();
                     pushlog.setProjectid(Long.valueOf(projectId));
+                    pushlog.setProjectname(projectInfo.getProjectname());
                     pushlog.setPushid(user.getPushid());
                     pushlog.setPushtitle(title);
                     pushlog.setPushtxt(content);
@@ -140,7 +141,7 @@ public class JGPushServiceImpl implements IJGPushService {
             QueryWrapper<FenhuoUsersEntity> userFilter = new QueryWrapper<>();
             userFilter.in("userid",servicersIdsArray);
             List<FenhuoUsersEntity> users = fenhuoUsersService.list(userFilter);
-            if (users == null || users.size()==0){
+            if (users == null || users.size() == 0){
                 logger.info("未找到相应用户，推送失败");
                 return false;
             }
@@ -149,8 +150,11 @@ public class JGPushServiceImpl implements IJGPushService {
                     logger.info("给维护人员推送通知，推送ID："+user.getPushid());
                     boolean b = JGPushUtil.pushMsgByRegID(user.getPushid(), title, content, extras);
                     if (b){
+                        FenhuoProjectinfoEntity projectInfo = getProjectInfo(projectId,title,content);
+
                         FenhuoPushlogEntity pushlog = new FenhuoPushlogEntity();
                         pushlog.setProjectid(Long.valueOf(projectId));
+                        pushlog.setProjectname(projectInfo.getProjectname());
                         pushlog.setPushid(user.getPushid());
                         pushlog.setUserid(user.getUserid());
                         pushlog.setPushtitle(title);

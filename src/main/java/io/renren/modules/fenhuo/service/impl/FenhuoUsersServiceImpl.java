@@ -181,7 +181,7 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         //sha256加密
         String salt = RandomStringUtils.randomAlphanumeric(20);
 
-        fenhuoUser.setPassword(new Sha256Hash("1234567890", salt).toHex());
+        fenhuoUser.setPassword(new Sha256Hash(fenhuoUser.getPassword(), salt).toHex());
         fenhuoUser.setSalt(salt);
         if (fenhuoUser.getStatus() == null){
             fenhuoUser.setStatus("1");

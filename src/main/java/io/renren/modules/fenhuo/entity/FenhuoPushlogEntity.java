@@ -29,6 +29,10 @@ public class FenhuoPushlogEntity implements Serializable {
 	 */
 	private Long projectid;
 	/**
+	 *
+	 */
+	private String projectname;
+	/**
 	 * 
 	 */
 	private String pushid;

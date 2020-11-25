@@ -148,7 +148,10 @@ public class AppFileController {
                 if (!projectUploadFileDir.exists()) {
                     boolean ok = projectUploadFileDir.mkdir();
                     if (!ok) {
-                        return R.error().put("msg", "project Upload directory can not create!");
+                        //故障附件是多个上传
+                        if (type != 3){
+                            return R.error().put("msg", "project Upload directory can not create!");
+                        }
                     }
                 }
 

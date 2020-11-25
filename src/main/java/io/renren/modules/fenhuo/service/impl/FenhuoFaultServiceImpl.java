@@ -157,10 +157,10 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
                 .eq("projectid", projectid);
 
         FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getOne(proinfoWrapper);
-//        String mids = projectinfo.getServicemid();
-//        String names = projectinfo.getServicemname();
-        String projectname = projectinfo.getProjectname();
 
+        String projectname = projectinfo.getProjectname();
+        String headids = projectinfo.getHeadid();
+        String headnames = projectinfo.getHeadname();
 
         /////////////////////////////////////////////////////
 
@@ -172,16 +172,18 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         fenhuoFaultdefend.setHostid(faultEntity.getHostid());
 
         // 维护人id 和 姓名
-
         fenhuoFaultdefend.setDefenderid(projectinfo.getServicemid());
         fenhuoFaultdefend.setDefendername(projectinfo.getServicemname());
         fenhuoFaultdefend.setLocationtime(new Date());
 
-        fenhuoFaultdefend.setPlan(faultEntity.getPlan());
 
+        FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(faultEntity.getDeclarer());
         // 申报人姓名
         fenhuoFaultdefend.setCreaterid(faultEntity.getDeclarer());
-        fenhuoFaultdefend.setCreatername(faultEntity.getDeclarername());
+        fenhuoFaultdefend.setCreatername(usersEntity.getRealname());
+        fenhuoFaultdefend.setHeadids(headids);
+        fenhuoFaultdefend.setHeadnames(headnames);
+        fenhuoFaultdefend.setProjectname(projectname);
 
         Date iniDate = new Date();
 
@@ -189,16 +191,13 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         fenhuoFaultdefend.setDefendstarttime(faultStarttime);
         fenhuoFaultdefend.setDefendendtime(faultStarttime);
 
-
-
-        fenhuoFaultdefend.setProjectname(projectname);
+        fenhuoFaultdefend.setFaulttypeid(faultEntity.getFaulttype());
+        fenhuoFaultdefend.setFaulttypename(faultEntity.getFaulttypename());
+        fenhuoFaultdefend.setPlan(faultEntity.getPlan());
         fenhuoFaultdefend.setFaultdesc(faultdesc);
-
         // 未开始维护
         fenhuoFaultdefend.setDefendresult(0);
 
-        String declarer = faultEntity.getDeclarer();
-        FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(declarer);
         //申报人是维护人员的话状态就为1
         if (usersEntity != null){
             if (usersEntity.getRoleid().equals("3")){

@@ -232,7 +232,7 @@ public class AppProjectController extends AbstractController {
     public R delete(@RequestParam Map<String,Object> param){
 
         String projectid = (String)param.get("projectid");
-        boolean isDelete = fenhuoUsersService.isDeleteByIds(Arrays.asList(projectid));
+        boolean isDelete = fenhuoProjectinfoService.removeByIdsBySetIsDeleted(Arrays.asList(projectid));
         if (isDelete){
             return R.ok();
         }else{
