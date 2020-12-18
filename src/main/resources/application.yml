@@ -10,7 +10,7 @@ server:
     context-path: /renren-fast
 
 uploadfileconfig:
-#  localuploadpath: /usr/local/fenghuo/renren-running-workdir/upload/
+##  localuploadpath: /usr/local/fenghuo/renren-running-workdir/fileupload/
   localuploadpath: fileupload
 
 spring:

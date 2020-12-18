@@ -11,6 +11,7 @@ import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.fenhuo.utils.ProjectRelatedfileObj;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.io.ResourceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,7 +105,14 @@ public class AppFileController {
 
 
         OpUtils opUtils = new OpUtils();
-        String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
+        String opPath = opUtils.getPath();
+        if (!opUtils.getPath().endsWith("/")){
+            opPath += "/";
+        }
+        String projuploadir = opPath + uploadFileConfig.getLocaluploadpath();
+        if (projuploadir.contains("file:")){
+            projuploadir = projuploadir.replace("file:","");
+        }
 
         CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
         commonsMultipartResolver.setDefaultEncoding("utf-8");
@@ -140,20 +148,24 @@ public class AppFileController {
                 projectfile.setType(type);
 
 
-                System.out.println("---------projectid: " + id + "-----UploadFileConfig.getLocaluploadpath():" + uploadFileConfig.getLocaluploadpath());
+                //System.out.println("---------projectid: " + id + "-----UploadFileConfig.getLocaluploadpath():" + uploadFileConfig.getLocaluploadpath());
 
 
                 String projectFileDir = projuploadir + projectfile.getFilepath();
+                System.out.println("========file path is:" + projectFileDir + "========");
+
+
                 File projectUploadFileDir = new File(projectFileDir);
                 if (!projectUploadFileDir.exists()) {
                     boolean ok = projectUploadFileDir.mkdir();
                     if (!ok) {
                         //故障附件是多个上传
-                        if (type != 3){
-                            return R.error().put("msg", "project Upload directory can not create!");
+                        if (type != 3) {
+                            return R.error().put("msg", "project upload directory can not create!");
                         }
                     }
                 }
+
 
                 File dest = new File(projectFileDir + fileName);
                 if (dest.exists()){

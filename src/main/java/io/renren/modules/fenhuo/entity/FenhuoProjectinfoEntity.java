@@ -179,4 +179,6 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	private Date recentclosetime;
 
 
+	private Integer alerttime;
+
 }

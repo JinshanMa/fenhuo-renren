@@ -132,8 +132,19 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     }
 
 
+    @Override
+    public List<FenhuoProjectinfoEntity> queryActivePage() {
 
 
+        QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<FenhuoProjectinfoEntity> queryChild = (QueryWrapper<FenhuoProjectinfoEntity>)queryWrapper.eq("isdelete", 0);
+        queryChild.and(wrapper->wrapper.eq("auditstatus", 101).or().eq("auditstatus",102));
+
+        List<FenhuoProjectinfoEntity> projectinfoEntityList = this.baseMapper.selectList(queryWrapper);
+
+
+        return projectinfoEntityList;
+    }
 
     @Override
     public PageUtils querySelectedPage(Map<String, Object> params) {

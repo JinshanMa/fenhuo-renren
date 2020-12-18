@@ -79,14 +79,20 @@ public class FenhuoFaultdefendEntity implements Serializable {
 	private Date defendendtime;
 
 	/**
-	 * 出发时间
+	 * 服务出发时间
 	 */
 	private Date defendsetouttime;
 
 	/**
-	 * 上门时间
+	 * 预约上门时间
 	 */
 	private Date defendvisittime;
+
+	/**
+	 * 提交给甲方确认时间   48小时自动确认
+	 * */
+	private Date defendsubmitverifytime;
+
 
 	/***
 	 * 项目id
@@ -108,8 +114,6 @@ public class FenhuoFaultdefendEntity implements Serializable {
 	private String hostname;
 
 	private String hostid;
-
-
 
 	private Integer faulttypeid;
 

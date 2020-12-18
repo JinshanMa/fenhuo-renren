@@ -17,7 +17,13 @@ import java.util.Map;
 public interface FenhuoFaultdefendService extends IService<FenhuoFaultdefendEntity> {
 
     PageUtils queryWithStatu(Map<String, Object> params);
+
     PageUtils queryPage(Map<String, Object> params);
+
+    /*
+    * 获取所有待确认维护单
+    * */
+    List<FenhuoFaultdefendEntity> queryPageWithStatu2();
 
     void removeByIdsBySetIsDeleted(List<Integer> asList);
 }

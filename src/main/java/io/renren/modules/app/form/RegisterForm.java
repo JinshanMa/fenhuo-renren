@@ -101,6 +101,10 @@ public class RegisterForm {
      */
     @Nullable
     private String sex;
+
+    @Nullable
+    private String email;
+
     /**
      * 省
      */
@@ -121,5 +125,11 @@ public class RegisterForm {
      */
     @Nullable
     private String address;
+
+    /**
+     * 职位
+     */
+    @Nullable
+    private String job;
 
 }

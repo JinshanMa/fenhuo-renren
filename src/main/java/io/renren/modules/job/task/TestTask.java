@@ -19,12 +19,13 @@ import org.springframework.stereotype.Component;
  *
  * @author Mark sunlightcs@gmail.com
  */
-@Component("testTask")
+@Component("myTask")
 public class TestTask implements ITask {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void run(String params){
-		logger.debug("TestTask定时任务正在执行，参数为：{}", params);
+		logger.debug("MyTask定时任务正在执行，参数为：{}", params);
+		System.out.println("MyTask执行");
 	}
 }
