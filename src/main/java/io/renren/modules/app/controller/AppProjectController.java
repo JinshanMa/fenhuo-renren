@@ -240,7 +240,7 @@ public class AppProjectController extends AbstractController {
         }
 
     }
-    
+
     @Login
     @RequestMapping("/info/{projectid}")
     public R info(@PathVariable("projectid") String projectid) {

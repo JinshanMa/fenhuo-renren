@@ -84,11 +84,51 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
         }
 
 
+        QueryWrapper<FenhuoFaultdefendEntity> original_wrapper = new QueryWrapper<FenhuoFaultdefendEntity>().eq("isdelete", 0)
+                .and(wrapper->wrapper.eq("defendresult", (String)params.get("faultType")))
+                .and(wrapper->wrapper.in(projectids.size() > 0, "projectid", projectids));
+
+        // 添加高级搜索的部分
+
+
+        String startDate = (String)params.get("startDate");
+
+        String endDate = (String)params.get("endDate");
+
+        String projname = (String)params.get("projname");
+
+        String projtypeid = (String)params.get("projtypeid");
+
+
+        if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
+
+            original_wrapper.and(wrapper->wrapper.ge("date_format(createtime,'%Y-%m-%d')",startDate)
+                    .le("date_format(createtime,'%Y-%m-%d')", endDate));
+        }
+
+        if(StringUtils.isNotBlank(projname)){
+            original_wrapper.and(wrapper->wrapper.like("projectname", projname));
+        }
+
+        if(StringUtils.isNotBlank(projtypeid)){
+            Set<Long> typeidList = new HashSet<Long>();
+            QueryWrapper<FenhuoProjectinfoEntity>  fenhuoqueryWrapper = new QueryWrapper<FenhuoProjectinfoEntity>();
+            fenhuoqueryWrapper.and(a->a.eq("projectypeid", projtypeid));
+            List<FenhuoProjectinfoEntity> fenhuoSpecificList = fenhuoProjectinfoService.list(fenhuoqueryWrapper);
+            for( FenhuoProjectinfoEntity entity : fenhuoSpecificList){
+                typeidList.add(entity.getProjectid());
+            }
+            if (typeidList.size() > 0) {
+                original_wrapper.and(wrapper -> wrapper.in("projectid", typeidList));
+            }
+        }
+
+
+        ////
+
         IPage<FenhuoFaultdefendEntity> page = this.page(
                 new Query<FenhuoFaultdefendEntity>().getPage(params),
-                new QueryWrapper<FenhuoFaultdefendEntity>().eq("isdelete", 0)
-                        .and(wrapper->wrapper.eq("defendresult", (String)params.get("faultType")))
-                        .and(wrapper->wrapper.in(projectids.size() > 0, "projectid", projectids))
+                original_wrapper
         );
 
         return new PageUtils(page);

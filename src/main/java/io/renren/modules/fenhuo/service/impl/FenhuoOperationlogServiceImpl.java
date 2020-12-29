@@ -57,6 +57,8 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
 
         String projectid = (String)params.get("projectid");
 
+        String projtypeid = (String)params.get("projtypeid");
+
         QueryWrapper<FenhuoOperationlogEntity>  queryWrapper = new QueryWrapper<FenhuoOperationlogEntity>();
         QueryWrapper<FenhuoOperationlogEntity> queryChild = (QueryWrapper<FenhuoOperationlogEntity>)queryWrapper.eq("isdelete", 0);
 
@@ -77,6 +79,18 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
         }
         if(StringUtils.isNotBlank(projectid)){
             queryChild.and(wrapper->wrapper.eq("projectid", projectid));
+        }
+        if(StringUtils.isNotBlank(projtypeid)){
+            Set<Long> typeidList = new HashSet<Long>();
+            QueryWrapper<FenhuoProjectinfoEntity>  fenhuoqueryWrapper = new QueryWrapper<FenhuoProjectinfoEntity>();
+            fenhuoqueryWrapper.and(a->a.eq("projectypeid", projtypeid));
+            List<FenhuoProjectinfoEntity> fenhuoSpecificList = fenhuoProjectinfoService.list(fenhuoqueryWrapper);
+            for( FenhuoProjectinfoEntity entity : fenhuoSpecificList){
+                typeidList.add(entity.getProjectid());
+            }
+            if (typeidList.size() > 0) {
+                queryChild.and(wrapper -> wrapper.in("projectid", typeidList));
+            }
         }
 
 
