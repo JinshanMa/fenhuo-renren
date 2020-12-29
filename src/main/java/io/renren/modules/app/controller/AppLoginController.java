@@ -155,7 +155,7 @@ public class AppLoginController {
     }
 
     @Login
-    @PostMapping("logout")
+    @GetMapping("logout")
     public R logout(@RequestParam String userId,@RequestParam String isSys){
 
         if (isSys.equals("1")){
@@ -164,8 +164,10 @@ public class AppLoginController {
         }else {
 
             FenhuoUsersEntity u = fenhuoUsersService.getById(userId);
-            u.setPushid("");
-            fenhuoUsersService.saveOrUpdate(u);
+            if (u != null){
+                u.setPushid("");
+                fenhuoUsersService.saveOrUpdate(u);
+            }
 
         }
 

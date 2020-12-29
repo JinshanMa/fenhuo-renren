@@ -60,6 +60,8 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String keyword = (String)params.get("keyword");
         String startDate = (String)params.get("startDate");
         String endDate = (String)params.get("endDate");
+        String type = (String)params.get("type");//类型id
+        String statu = (String)params.get("statu");//项目状态
 
         QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<>();
         QueryWrapper<FenhuoProjectinfoEntity> queryChild = (QueryWrapper<FenhuoProjectinfoEntity>)queryWrapper.eq("isdelete", 0);
@@ -69,6 +71,14 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         }
         if (StringUtils.isNotBlank(keyword)){
             queryChild.and(wrapper->wrapper.like("projectname", keyword));
+        }
+
+        if (StringUtils.isNotBlank(type)){
+            queryChild.and(wrapper->wrapper.like("projectypeid", Integer.parseInt(type)));
+        }
+
+        if (StringUtils.isNotBlank(statu)){
+            queryChild.and(wrapper->wrapper.like("auditstatus", Integer.parseInt(statu)));
         }
 
         IPage<FenhuoProjectinfoEntity> page = this.page(
