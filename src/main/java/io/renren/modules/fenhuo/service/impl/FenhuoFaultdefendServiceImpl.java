@@ -34,16 +34,15 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
 
 
         QueryWrapper<FenhuoFaultdefendEntity> queryWrapper = new QueryWrapper<FenhuoFaultdefendEntity>();
-        if (StringUtils.isNotBlank(projectid) && StringUtils.isNotBlank(statu)){
+        if (StringUtils.isNotBlank(projectid) && StringUtils.isNotBlank(statu)) {
 
-            QueryWrapper<FenhuoFaultdefendEntity> queryChild = (QueryWrapper<FenhuoFaultdefendEntity>)queryWrapper.eq("isdelete", 0);
+            QueryWrapper<FenhuoFaultdefendEntity> queryChild = (QueryWrapper<FenhuoFaultdefendEntity>) queryWrapper.eq("isdelete", 0);
 
-            queryChild.and(wrapper->wrapper.eq("projectid", projectid));
+            queryChild.and(wrapper -> wrapper.eq("projectid", projectid));
 
-            queryChild.and(wrapper->wrapper.eq("defendresult", Integer.parseInt(statu)));
+            queryChild.and(wrapper -> wrapper.eq("defendresult", Integer.parseInt(statu)));
 
         }
-
 
         IPage<FenhuoFaultdefendEntity> page = this.page(
                 new Query<FenhuoFaultdefendEntity>().getPage(params),
@@ -54,6 +53,18 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
         return new PageUtils(page);
     }
 
+    @Override
+    public List<FenhuoFaultdefendEntity> queryPageWithStatu2() {
+        QueryWrapper<FenhuoFaultdefendEntity> queryWrapper = new QueryWrapper<FenhuoFaultdefendEntity>();
+
+        QueryWrapper<FenhuoFaultdefendEntity> queryChild = (QueryWrapper<FenhuoFaultdefendEntity>) queryWrapper.eq("isdelete", 0);
+
+        queryChild.and(wrapper -> wrapper.eq("defendresult", 2));
+
+        List<FenhuoFaultdefendEntity> queryList = (List<FenhuoFaultdefendEntity>)this.baseMapper.selectList(queryWrapper);
+
+        return queryList;
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

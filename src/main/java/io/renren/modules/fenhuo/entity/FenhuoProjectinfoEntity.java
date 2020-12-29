@@ -164,7 +164,7 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	private String projectype;
 
 	/**
-	 * 项目类型id
+	 * 项目类型名称
 	 */
 	private Integer projectypeid;
 
@@ -178,5 +178,7 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	 */
 	private Date recentclosetime;
 
+
+	private Integer alerttime;
 
 }

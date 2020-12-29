@@ -19,9 +19,19 @@ import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
 import io.renren.modules.fenhuo.utils.ZabbixApiUtils;
+import io.renren.modules.job.entity.ScheduleJobEntity;
+import io.renren.modules.job.service.ScheduleJobService;
+import io.renren.modules.job.utils.ScheduleUtils;
 import io.renren.modules.sys.controller.AbstractController;
 import org.apache.commons.lang.StringUtils;
+import org.quartz.*;
+import org.quartz.Calendar;
+import org.quartz.impl.StdScheduler;
+import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,6 +59,12 @@ public class AppProjectController extends AbstractController {
 
     @Autowired
     private UploadFileConfig uploadFileConfig;
+
+    @Autowired
+    SchedulerFactoryBean schedulerFactoryBean;
+
+    @Autowired
+    ScheduleJobService scheduleJobService;
 
     /**
      * 列表
@@ -130,6 +146,35 @@ public class AppProjectController extends AbstractController {
     public R activeProject(@RequestParam Map<String,Object> param){
 
         String projectid = (String)param.get("projectid");
+
+        FenhuoProjectinfoEntity projectinfoEntity = fenhuoProjectinfoService.getById(projectid);
+
+//        //为空说明首次激活，直接创建定时器
+//        if (projectinfoEntity.getRecentactivetime() == null){
+//
+//            try {
+//                //Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+//                ScheduleJobEntity scheduleJobEntity = new ScheduleJobEntity();
+//                scheduleJobEntity.setCreateTime(new Date());
+//                scheduleJobEntity.setRemark(projectinfoEntity.getProjectname() + "-项目服务时间");
+//                scheduleJobEntity.setBeanName("projectTask");
+//                scheduleJobEntity.setParams(projectid);
+//                scheduleJobEntity.setStatus(0);
+//                String effectiveDay = projectinfoEntity.getEffectivetime();
+//                int minute = Integer.parseInt(effectiveDay) * 24 * 60;
+//                //String cron = "0 0/" + minute + " * * * ?";
+//                String cron = "0 0/1 * * * ?";
+//                scheduleJobEntity.setCronExpression(cron);
+//
+//                ScheduleUtils.createScheduleJob(schedulerFactoryBean.getScheduler(),scheduleJobEntity);
+//
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+//
+//
+//        }
+
         return  operateProject(projectid,104);
 
     }
@@ -187,7 +232,7 @@ public class AppProjectController extends AbstractController {
     public R delete(@RequestParam Map<String,Object> param){
 
         String projectid = (String)param.get("projectid");
-        boolean isDelete = fenhuoUsersService.isDeleteByIds(Arrays.asList(projectid));
+        boolean isDelete = fenhuoProjectinfoService.removeByIdsBySetIsDeleted(Arrays.asList(projectid));
         if (isDelete){
             return R.ok();
         }else{
@@ -353,6 +398,28 @@ public class AppProjectController extends AbstractController {
     }
 
 
+    public static void main(String[] args) {
+
+        try {
+            Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+
+            ScheduleJobEntity scheduleJobEntity = new ScheduleJobEntity();
+            scheduleJobEntity.setCreateTime(new Date());
+            scheduleJobEntity.setRemark("-项目服务时间");
+            scheduleJobEntity.setBeanName("projectTask");
+            scheduleJobEntity.setParams("39");
+            scheduleJobEntity.setStatus(0);
+            //String cron = "0 0/" + minute + " * * * ?";
+            String cron = "0 0/1 * * * ?";
+            scheduleJobEntity.setCronExpression(cron);
+
+            scheduler.start();
+            ScheduleUtils.createScheduleJob(scheduler,scheduleJobEntity);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
 }

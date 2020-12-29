@@ -26,6 +26,8 @@ public interface FenhuoProjectinfoService extends IService<FenhuoProjectinfoEnti
 
     PageUtils querySelectedPage(Map<String, Object> params);
 
+    List<FenhuoProjectinfoEntity> queryActivePage();
+
     boolean saveProjectInfo(FenhuoProjectinfoEntity projectinfo);
 
     boolean removeByIdsBySetIsDeleted(Collection<? extends Serializable> idList);

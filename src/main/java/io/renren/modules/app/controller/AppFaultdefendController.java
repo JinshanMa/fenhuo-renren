@@ -7,7 +7,10 @@ import io.renren.modules.fenhuo.service.FenhuoFaultdefendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -45,9 +48,9 @@ public class AppFaultdefendController {
     @RequestMapping("/save")
     public R save(@RequestBody FenhuoFaultdefendEntity fenhuoFaultdefend){
 
-		fenhuoFaultdefendService.save(fenhuoFaultdefend);
+        fenhuoFaultdefendService.save(fenhuoFaultdefend);
 
-        return R.ok();
+        return R.ok();//.put("id",fenhuoFaultdefend.getFaultid())
     }
 
     /**
@@ -55,8 +58,10 @@ public class AppFaultdefendController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody FenhuoFaultdefendEntity fenhuoFaultdefend){
+        if (fenhuoFaultdefend.getDefendresult().equals("2")){
+            fenhuoFaultdefend.setDefendsubmitverifytime(new Date());
+        }
         fenhuoFaultdefendService.updateById(fenhuoFaultdefend);
-
         return R.ok();
     }
 
@@ -66,6 +71,29 @@ public class AppFaultdefendController {
     @RequestMapping("/delete")
     public R delete(@RequestBody Integer[] defendids){
         fenhuoFaultdefendService.removeByIds(Arrays.asList(defendids));
+
+        return R.ok();
+    }
+
+    @RequestMapping("/updatetime")
+    public R updatetime(@RequestParam(value = "faultid") long faultid, @RequestParam(value = "time") String time, @RequestParam(value = "type") int type){
+        FenhuoFaultdefendEntity entity = fenhuoFaultdefendService.getById(faultid);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = simpleDateFormat.parse(time);
+            if (type == 1){
+                entity.setDefendvisittime(date);
+            }else if (type == 2){
+                entity.setDefendsetouttime(date);
+            }else if (type == 3){
+                entity.setDefendstarttime(date);
+            }else if (type == 4){
+                entity.setDefendendtime(date);
+            }
+            fenhuoFaultdefendService.saveOrUpdate(entity);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         return R.ok();
     }

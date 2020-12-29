@@ -29,6 +29,10 @@ public class FenhuoPushlogEntity implements Serializable {
 	 */
 	private Long projectid;
 	/**
+	 *
+	 */
+	private String projectname;
+	/**
 	 * 
 	 */
 	private String pushid;
@@ -44,5 +48,12 @@ public class FenhuoPushlogEntity implements Serializable {
 	 * 
 	 */
 	private Date pushtime;
+
+	private Long userid;
+
+	/**
+	 * 推送类型  1.项目推送   2.故障推送   3.zabbix推送
+	 */
+	private Integer pushtype;
 
 }

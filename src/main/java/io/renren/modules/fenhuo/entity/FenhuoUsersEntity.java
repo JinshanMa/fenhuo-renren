@@ -146,10 +146,16 @@ public class FenhuoUsersEntity implements Serializable {
 	 */
 	private String address;
 	/**
-	 * 状态
+	 * 状态 0审核中  1正常
 	 */
-	private String status;//0审核中  1正常
+	private String status;
+
+	/**
+	 * 职位
+	 */
+	private String job;
 
 
+	private String email;
 
 }

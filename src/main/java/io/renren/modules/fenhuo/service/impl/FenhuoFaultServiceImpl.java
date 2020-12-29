@@ -52,7 +52,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Autowired
     private FenhuoProjectfileService fenhuoProjectfileService;
 
-
+    //web
     public void saveFault(FenhuoFaultEntity faultEntity){
         faultEntity.setCreatetime(new Date());
 
@@ -77,6 +77,8 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         fenhuoFaultdefendEntity.setFaultid(faultEntity.getFaultid());
         fenhuoFaultdefendEntity.setProjectid(Long.parseLong(projectid));
         fenhuoFaultdefendEntity.setProjectname(projectinfo.getProjectname());
+        fenhuoFaultdefendEntity.setHostname(faultEntity.getHostname());
+        fenhuoFaultdefendEntity.setHostid(faultEntity.getHostid());
         fenhuoFaultdefendEntity.setDefenderid(mids);
         fenhuoFaultdefendEntity.setDefendername(names);
         fenhuoFaultdefendEntity.setLocationtime(new Date());
@@ -94,6 +96,22 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
         fenhuoFaultdefendEntity.setFaultdesc(faultEntity.getFaultdesc());
         fenhuoFaultdefendEntity.setDefendresult(0);
+        String declarer = faultEntity.getDeclarer();
+        FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(declarer);
+        //申报人是维护人员的话状态就为1
+        if (usersEntity != null){
+            if (usersEntity.getRoleid().equals("3")){
+                fenhuoFaultdefendEntity.setDefendresult(1);
+                fenhuoFaultdefendService.save(fenhuoFaultdefendEntity);
+                Map<String,String> extras = new HashMap<>();
+                extras.put("content","正在维护：" + faultEntity.getFaultdesc());
+                extras.put("projectId",projectid);
+                extras.put("projectName",projectinfo.getProjectname());
+                extras.put("msgType","extra-msgType");
+                jGPushService.notifyHeader(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
+                return;
+            }
+        }
         fenhuoFaultdefendService.save(fenhuoFaultdefendEntity);
 
         Map<String,String> extras = new HashMap<>();
@@ -104,14 +122,17 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
     }
 
+    //app
     @Override
     public boolean savefenhuofault(FenhuoFaultEntity faultEntity) {
 
         faultEntity.setCreatetime(new Date());
 
         // 设置故障类型名称
-        String faultname = getSysConfig(String.valueOf(faultEntity.getFaulttype()));
-        faultEntity.setFaulttypename(faultname);
+        if (faultEntity.getFaulttype() != 0){
+            String faultname = getSysConfig(String.valueOf(faultEntity.getFaulttype()));
+            faultEntity.setFaulttypename(faultname);
+        }
 
         // 新添加的故障申报默认为  申报成功
         faultEntity.setFaultstatus(500);
@@ -136,10 +157,10 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
                 .eq("projectid", projectid);
 
         FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getOne(proinfoWrapper);
-//        String mids = projectinfo.getServicemid();
-//        String names = projectinfo.getServicemname();
-        String projectname = projectinfo.getProjectname();
 
+        String projectname = projectinfo.getProjectname();
+        String headids = projectinfo.getHeadid();
+        String headnames = projectinfo.getHeadname();
 
         /////////////////////////////////////////////////////
 
@@ -147,18 +168,22 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 
         fenhuoFaultdefend.setProjectid(Long.valueOf(projectid));
         fenhuoFaultdefend.setFaultid(faultEntity.getFaultid());
+        fenhuoFaultdefend.setHostname(faultEntity.getHostname());
+        fenhuoFaultdefend.setHostid(faultEntity.getHostid());
 
         // 维护人id 和 姓名
-
         fenhuoFaultdefend.setDefenderid(projectinfo.getServicemid());
         fenhuoFaultdefend.setDefendername(projectinfo.getServicemname());
         fenhuoFaultdefend.setLocationtime(new Date());
 
-        fenhuoFaultdefend.setPlan(faultEntity.getPlan());
 
+        FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(faultEntity.getDeclarer());
         // 申报人姓名
         fenhuoFaultdefend.setCreaterid(faultEntity.getDeclarer());
-        fenhuoFaultdefend.setCreatername(faultEntity.getDeclarername());
+        fenhuoFaultdefend.setCreatername(usersEntity.getRealname());
+        fenhuoFaultdefend.setHeadids(headids);
+        fenhuoFaultdefend.setHeadnames(headnames);
+        fenhuoFaultdefend.setProjectname(projectname);
 
         Date iniDate = new Date();
 
@@ -166,13 +191,29 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         fenhuoFaultdefend.setDefendstarttime(faultStarttime);
         fenhuoFaultdefend.setDefendendtime(faultStarttime);
 
-
-
-        fenhuoFaultdefend.setProjectname(projectname);
+        fenhuoFaultdefend.setFaulttypeid(faultEntity.getFaulttype());
+        fenhuoFaultdefend.setFaulttypename(faultEntity.getFaulttypename());
+        fenhuoFaultdefend.setPlan(faultEntity.getPlan());
         fenhuoFaultdefend.setFaultdesc(faultdesc);
-
         // 未开始维护
         fenhuoFaultdefend.setDefendresult(0);
+
+        //申报人是维护人员的话状态就为1
+        if (usersEntity != null){
+            if (usersEntity.getRoleid().equals("3")){
+                fenhuoFaultdefend.setDefendresult(1);
+                fenhuoFaultdefendService.save(fenhuoFaultdefend);
+                Map<String,String> extras = new HashMap<>();
+                extras.put("content","正在维护：" + faultEntity.getFaultdesc());
+                extras.put("projectId",projectid);
+                extras.put("projectName",projectinfo.getProjectname());
+                extras.put("msgType","extra-msgType");
+                jGPushService.notifyHeader(String.valueOf(projectinfo.getProjectid()), projectinfo.getProjectname(), faultEntity.getFaulttypename(), extras, null, null);
+                return true;
+            }
+        }
+
+
         fenhuoFaultdefendService.save(fenhuoFaultdefend);
         /////////////////////////////////////////////////////
 
@@ -182,7 +223,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         extras.put("projectName",projectname);
         extras.put("msgType","extra-msgType");
 
-        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultname, extras, null, null);
+        jGPushService.notifyServicers(String.valueOf(projectinfo.getProjectid()), projectname, faultEntity.getFaulttypename(), extras, null, null);
 
         return true;
     }

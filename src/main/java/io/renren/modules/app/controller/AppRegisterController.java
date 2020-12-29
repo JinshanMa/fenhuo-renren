@@ -68,8 +68,9 @@ public class AppRegisterController {
         FenhuoUsersEntity user = new FenhuoUsersEntity();
         user.setMobile(form.getMobile());
         user.setRoleid(form.getRoleid());
+        user.setRolename(form.getRolename());
         user.setRealname(form.getRealname());
-        user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
+        user.setPassword(form.getPassword());//(DigestUtils.sha256Hex(form.getPassword()));
         user.setCreateTime(new Date());
         user.setLoginname(form.getMobile());
         user.setArea(form.getArea());
@@ -82,6 +83,7 @@ public class AppRegisterController {
         user.setContacts(form.getContactstel());
         user.setContactstel(form.getContactstel());
         user.setSex(form.getSex());
+        user.setEmail(form.getEmail());
         user.setSkill(form.getSkill());
         user.setRemark(form.getRemark());
         user.setUniversity(form.getUniversity());

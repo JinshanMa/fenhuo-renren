@@ -54,7 +54,7 @@ public class AppYunPianController {
                     System.out.println("删除session中的验证码" + code);
                     httpSession.removeAttribute(mobile);
                 }
-            },1 * 60 * 1000);
+            },3 * 60 * 1000);
 
             return R.ok();
         }else{
