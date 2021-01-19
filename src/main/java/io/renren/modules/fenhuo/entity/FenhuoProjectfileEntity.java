@@ -33,6 +33,16 @@ public class FenhuoProjectfileEntity implements Serializable {
 	 * 项目创建时间
 	 */
 	private Date createdatetime;
+
+	/**
+	 * 技术文档类别
+	 */
+	private Long techcatalogid;
+
+	/**
+	 * 技术文档类别名称
+	 */
+	private String techcatalogname;
 	/**
 	 * 文件名
 	 */

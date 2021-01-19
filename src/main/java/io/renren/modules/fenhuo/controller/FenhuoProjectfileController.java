@@ -3,6 +3,7 @@ package io.renren.modules.fenhuo.controller;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,7 +11,9 @@ import io.renren.config.UploadFileConfig;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.sys.controller.AbstractController;
+import io.renren.modules.sys.entity.SysConfigEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysConfigService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,8 @@ public class FenhuoProjectfileController extends AbstractController {
     @Autowired
     private UploadFileConfig uploadFileConfig;
 
+    @Autowired
+    private SysConfigService sysConfigService;
     /**
      * 技术文档列表
      */
@@ -57,7 +62,7 @@ public class FenhuoProjectfileController extends AbstractController {
     }
 
     /**
-     * 技术文档列表
+     * 故障文件上传
      */
     @RequestMapping("/faultlist")
     @RequiresPermissions("fenhuo:faultfile:list")
@@ -126,12 +131,23 @@ public class FenhuoProjectfileController extends AbstractController {
 
 
     @RequestMapping("/upload")
-    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type){
+    public R uploadRelatedFile(@RequestParam("filecatalogid") long filecatalogid,
+                               @RequestParam(value = "id",required = false) String id,
+                               @RequestParam("type") long type,
+                               @RequestParam("files") MultipartFile[] files){
         String uploadusername;
+        String filecatalogname = "no catalog";
         if(getUser() instanceof SysUserEntity){
             uploadusername = ((SysUserEntity)getUser()).getUsername();
         }else{
             uploadusername = ((FenhuoUsersEntity)getUser()).getRealname();
+        }
+        QueryWrapper<SysConfigEntity> queryWrapper = new QueryWrapper<SysConfigEntity>();
+        QueryWrapper<SysConfigEntity> querychild = queryWrapper.eq("param_key", filecatalogid);
+        List<SysConfigEntity> sysUserEntityList = sysConfigService.list(querychild);
+        if (sysUserEntityList.size() > 0){
+            SysConfigEntity sysConfigEntity = sysUserEntityList.get(0);
+            filecatalogname = sysConfigEntity.getParamValue();
         }
 
         OpUtils opUtils = new OpUtils();
@@ -144,17 +160,20 @@ public class FenhuoProjectfileController extends AbstractController {
             projuploadir = projuploadir.replace("file:","");
         }
 
-        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-        commonsMultipartResolver.setDefaultEncoding("utf-8");
+//        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+//        commonsMultipartResolver.setDefaultEncoding("utf-8");
 
-        if (commonsMultipartResolver.isMultipart(request)){
-            MultipartHttpServletRequest mulReq = (MultipartHttpServletRequest) request;
-            Map<String, MultipartFile> map = mulReq.getFileMap();
+//        if (commonsMultipartResolver.isMultipart(request)){
+//            MultipartHttpServletRequest mulReq = (MultipartHttpServletRequest) request;
+//            Map<String, MultipartFile> map = mulReq.getFileMap();
 
             // key为前端的name属性，value为上传的对象（MultipartFile）
-            for (Map.Entry<String, MultipartFile> entry : map.entrySet()) {
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) {
+                    return R.error("filename is empty");
+                }
                 // 自己的保存文件逻辑
-                String fileName = entry.getValue().getOriginalFilename();
+                String fileName = file.getOriginalFilename();
 
                 ///// 把项目信息存入项目文件表中
                 String relatedJarPath = opUtils.getPath();
@@ -165,6 +184,8 @@ public class FenhuoProjectfileController extends AbstractController {
                     projectfile.setProjectid(Integer.valueOf(id));
                 }
                 projectfile.setFilename(fileName);
+                projectfile.setTechcatalogid(filecatalogid);
+                projectfile.setTechcatalogname(filecatalogname);
 
                 if (type == 1){
                     projectfile.setFilepath("/skill/");
@@ -174,7 +195,7 @@ public class FenhuoProjectfileController extends AbstractController {
                     projectfile.setFilepath("/fault_" + id + "/" );
                 }
                 projectfile.setFiletype(fileName.substring(fileName.lastIndexOf(".") + 1));
-                projectfile.setFilesize(entry.getValue().getSize());
+                projectfile.setFilesize(file.getSize());
                 projectfile.setCreatedatetime(new Date());
                 projectfile.setCreator(uploadusername);
                 projectfile.setType(type);
@@ -205,7 +226,7 @@ public class FenhuoProjectfileController extends AbstractController {
                 }else{
                     fenhuoProjectfileService.save(projectfile);
                     try {
-                        entry.getValue().transferTo(dest);
+                        file.transferTo(dest);
 //                    String fullpath = dest.getAbsolutePath();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -214,7 +235,7 @@ public class FenhuoProjectfileController extends AbstractController {
 
 
             }
-        }
+//        }
 
 
 

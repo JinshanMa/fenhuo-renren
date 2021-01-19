@@ -20,15 +20,43 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
 
+        // 技术文件类型
         String type = (String)params.get("type");
+
+        // 文件创建开始时间
+        String startDate = (String)params.get("startDate");
+
+        // 文件创建结束时间
+        String endDate = (String)params.get("endDate");
+
+        String techcatalogId = (String)params.get("techcatalogid");
+
+        String filtypename = (String)params.get("filtypename");
+
+        String creatorname = (String)params.get("creatorname");
+
 
         QueryWrapper<FenhuoProjectfileEntity>  queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>();
 
         if(StringUtils.isNotBlank(type)){
             queryWrapper.and(wrapper->wrapper.ge("type",Long.parseLong(type)));
-
+        }
+        if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
+            queryWrapper.and(wrapper->wrapper.ge("date_format(createdatetime,'%Y-%m-%d')",startDate)
+                    .le("date_format(createdatetime,'%Y-%m-%d')", endDate));
         }
 
+        if(StringUtils.isNotBlank(techcatalogId)){
+            queryWrapper.and(wrapper->wrapper.eq("techcatalogid", techcatalogId));
+        }
+        if(StringUtils.isNotBlank(filtypename)){
+            queryWrapper.and(wrapper->wrapper.like("filetype", filtypename));
+        }
+        if(StringUtils.isNotBlank(creatorname)){
+            queryWrapper.and(wrapper->wrapper.like("creator", creatorname));
+        }
+
+        queryWrapper.orderByDesc("fileid");
 
         IPage<FenhuoProjectfileEntity> page = this.page(
                 new Query<FenhuoProjectfileEntity>().getPage(params),
