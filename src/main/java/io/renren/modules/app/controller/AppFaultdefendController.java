@@ -78,7 +78,7 @@ public class AppFaultdefendController {
     @RequestMapping("/updatetime")
     public R updatetime(@RequestParam(value = "faultid") long faultid, @RequestParam(value = "time") String time, @RequestParam(value = "type") int type){
         FenhuoFaultdefendEntity entity = fenhuoFaultdefendService.getById(faultid);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
             Date date = simpleDateFormat.parse(time);
             if (type == 1){
