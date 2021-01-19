@@ -16,5 +16,7 @@ import java.util.Map;
 public interface FenhuoProjectfileService extends IService<FenhuoProjectfileEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils queryFaultlistPage(Map<String, Object> params);
 }
 

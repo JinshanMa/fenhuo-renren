@@ -313,7 +313,7 @@ public class FenhuoProjectinfoController extends AbstractController {
     @PostMapping("/upload/{projectid}")
     @RequiresPermissions("fenhuo:proj:upload")
     public R uploadRelatedFile(@PathVariable("projectid") String projectid,
-                               @RequestParam("deleteFiles") String[] delFilenames,
+                               @RequestParam("deleteFiles") String[] delFileIds,
                                @RequestParam("files") MultipartFile[] files){
         OpUtils opUtils = new OpUtils();
         String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
@@ -327,22 +327,28 @@ public class FenhuoProjectinfoController extends AbstractController {
         List<FenhuoProjectfileEntity> filelists = fenhuoProjectfileService.list(queryWrapper);
 //        String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + OpUtils.getBacklash();
 
-        // 如果 待删除的文件长度等于零表示有文件需要删除
-        if (delFilenames.length > 0){
+        // 如果 待删除的文件长度大于零表示有文件需要删除
+        if (delFileIds.length > 0){
 //            List<String> totalpaths = new ArrayList<String>(Arrays.asList(projectinfo.getFileurl().split(OpUtils.getSplitNotation())));
-            for (String deletingFilename: delFilenames){
-
-                for (FenhuoProjectfileEntity projectfile: filelists){
-                    if(projectfile.getFilename().equals(deletingFilename)){
-                        fenhuoProjectfileService.removeById(projectfile.getFileid());
-                        String deletingfilepath = projuploadir + projectfile.getFilepath() + projectfile.getFilename();
-                        File file = new File(deletingfilepath);
-                        if(file.exists()){
-                            file.delete();
-                        }
-                        break;
-                    }
+            for (String deletingFileId: delFileIds){
+                FenhuoProjectfileEntity relatedFile = fenhuoProjectfileService.getById(deletingFileId);
+                String deletingFilepath = projuploadir + relatedFile.getFilepath() + relatedFile.getFilename();
+                File file = new File(deletingFilepath);
+                if(file.exists()){
+                    file.delete();
                 }
+                fenhuoProjectfileService.removeById(deletingFileId);
+//                for (FenhuoProjectfileEntity projectfile: filelists){
+//                    if(projectfile.getFilename().equals(deletingFilename)){
+//                        fenhuoProjectfileService.removeById(projectfile.getFileid());
+//                        String deletingfilepath = projuploadir + projectfile.getFilepath() + projectfile.getFilename();
+//                        File file = new File(deletingfilepath);
+//                        if(file.exists()){
+//                            file.delete();
+//                        }
+//                        break;
+//                    }
+//                }
             }
         }
         for (MultipartFile file : files) {
@@ -434,6 +440,7 @@ public class FenhuoProjectinfoController extends AbstractController {
         for(FenhuoProjectfileEntity relatedfile :filelist){
             String filename = relatedfile.getFilename();
             ProjectRelatedfileObj fileobj = new ProjectRelatedfileObj();
+            fileobj.setFileid(relatedfile.getFileid());
             fileobj.setUid(String.valueOf(filename.hashCode()));
             fileobj.setName(filename);
             filenames.add(fileobj);

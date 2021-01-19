@@ -37,5 +37,7 @@ public interface FenhuoFaultService extends IService<FenhuoFaultEntity> {
     void noideamaintain(String faultid);
 
     void relatedFileDownload(HttpServletRequest request, HttpServletResponse res);
+
+    void removeBySetisdeleted(String[] faultids);
 }
 

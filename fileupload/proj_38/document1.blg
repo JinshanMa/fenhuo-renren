@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: document1.aux
+Reallocating 'name_of_file' (item size: 1) to 6 items.
+The style file: plain.bst
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+Database file #1: document.bib
+Warning--empty booktitle in inproceedings2012
+Warning--empty year in 2019electrity
+Warning--there's a number but no volume in geoTaiwanStrait
+You've used 25 entries,
+            2118 wiz_defined-function locations,
+            671 strings with 8952 characters,
+and the built_in function-call counts, 9482 in all, are:
+= -- 889
+> -- 533
+< -- 3
++ -- 214
+- -- 184
+* -- 769
+:= -- 1603
+add.period$ -- 75
+call.type$ -- 25
+change.case$ -- 167
+chr.to.int$ -- 0
+cite$ -- 28
+duplicate$ -- 305
+empty$ -- 683
+format.name$ -- 184
+if$ -- 1943
+int.to.chr$ -- 0
+int.to.str$ -- 25
+missing$ -- 25
+newline$ -- 128
+num.names$ -- 50
+pop$ -- 140
+preamble$ -- 1
+purify$ -- 142
+quote$ -- 0
+skip$ -- 211
+stack$ -- 0
+substring$ -- 622
+swap$ -- 52
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 100
+warning$ -- 3
+while$ -- 75
+width$ -- 27
+write$ -- 273
+(There were 3 warnings)

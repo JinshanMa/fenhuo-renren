@@ -38,4 +38,26 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
         return new PageUtils(page);
     }
 
+    @Override
+    public PageUtils queryFaultlistPage(Map<String, Object> params) {
+
+        String type = (String)params.get("type");
+        String faultid = (String)params.get("faultid");
+
+        QueryWrapper<FenhuoProjectfileEntity>  queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>();
+
+        if(StringUtils.isNotBlank(type)){
+            queryWrapper.and(wrapper->wrapper.eq("type",Long.parseLong(type)));
+        }
+        if(StringUtils.isNotBlank(faultid)){
+            queryWrapper.and(wrapper->wrapper.eq("projectid", Integer.valueOf(faultid)));
+        }
+
+        IPage<FenhuoProjectfileEntity> page = this.page(
+                new Query<FenhuoProjectfileEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
 }

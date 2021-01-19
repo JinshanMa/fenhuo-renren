@@ -28,6 +28,11 @@ public class FenhuoProjectfileEntity implements Serializable {
 	 * 项目id
 	 */
 	private Integer projectid;
+
+	/**
+	 * 项目创建时间
+	 */
+	private Date createdatetime;
 	/**
 	 * 文件名
 	 */
@@ -36,6 +41,11 @@ public class FenhuoProjectfileEntity implements Serializable {
 	 * 文件路径
 	 */
 	private String filepath;
+
+	/**
+	 * 文件上传人员姓名
+	 */
+	private String creator;
 	/**
 	 * 文件类型
 	 */

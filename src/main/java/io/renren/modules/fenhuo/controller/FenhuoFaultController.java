@@ -191,8 +191,8 @@ public class FenhuoFaultController extends AbstractController {
     @RequestMapping("/delete")
     @RequiresPermissions("fenhuo:fenhuofault:delete")
     public R delete(@RequestBody String[] faultids){
-		fenhuoFaultService.removeByIds(Arrays.asList(faultids));
-
+//		fenhuoFaultService.removeByIds(Arrays.asList(faultids));
+		fenhuoFaultService.removeBySetisdeleted(faultids);
         return R.ok();
     }
     /**
@@ -261,7 +261,7 @@ public class FenhuoFaultController extends AbstractController {
     @PostMapping("/upload/{faultid}")
     @RequiresPermissions("fenhuo:fault:upload")
     public R uploadFaultRelatedFile(@PathVariable("faultid") String faultid,
-                               @RequestParam("deleteFiles") String[] delFilenames,
+                               @RequestParam("deleteFiles") String[] delFileIds,
                                @RequestParam("files") MultipartFile[] files){
         OpUtils opUtils = new OpUtils();
         String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
@@ -276,22 +276,34 @@ public class FenhuoFaultController extends AbstractController {
 //        String projectFileDir = uploadFileConfig.getLocaluploadpath() + projectinfo.getProjectname() + OpUtils.getBacklash();
 
         // 如果 待删除的文件长度等于零表示有文件需要删除
-        if (delFilenames.length > 0){
+        if (delFileIds.length > 0){
 //            List<String> totalpaths = new ArrayList<String>(Arrays.asList(projectinfo.getFileurl().split(OpUtils.getSplitNotation())));
-            for (String deletingFilename: delFilenames){
-
-                for (FenhuoProjectfileEntity projectfile: filelists){
-                    if(projectfile.getFilename().equals(deletingFilename)){
-                        fenhuoProjectfileService.removeById(projectfile.getFileid());
-                        String deletingfilepath = projuploadir + projectfile.getFilepath() + projectfile.getFilename();
-                        File file = new File(deletingfilepath);
-                        if(file.exists()){
-                            file.delete();
-                        }
-                        break;
-                    }
+            for (String deletingFileId: delFileIds){
+                FenhuoProjectfileEntity relatedFile = fenhuoProjectfileService.getById(deletingFileId);
+                String deletingFilepath = projuploadir + relatedFile.getFilepath() + relatedFile.getFilename();
+                File file = new File(deletingFilepath);
+                if(file.exists()){
+                    file.delete();
                 }
+                fenhuoProjectfileService.removeById(deletingFileId);
+//                for (FenhuoProjectfileEntity projectfile: filelists){
+//                    if(projectfile.getFilename().equals(deletingFilename)){
+//                        fenhuoProjectfileService.removeById(projectfile.getFileid());
+//                        String deletingfilepath = projuploadir + projectfile.getFilepath() + projectfile.getFilename();
+//                        File file = new File(deletingfilepath);
+//                        if(file.exists()){
+//                            file.delete();
+//                        }
+//                        break;
+//                    }
+//                }
             }
+        }
+        String uploadusername;
+        if(getUser() instanceof SysUserEntity){
+            uploadusername = ((SysUserEntity)getUser()).getUsername();
+        }else{
+            uploadusername = ((FenhuoUsersEntity)getUser()).getRealname();
         }
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
@@ -313,6 +325,8 @@ public class FenhuoFaultController extends AbstractController {
 //            projectfile.setFileid(Long.valueOf(projectid));
             projectfile.setFiletype(fileName.substring(fileName.lastIndexOf(".") + 1));
             projectfile.setFilesize(file.getSize());
+            projectfile.setCreatedatetime(new Date());
+            projectfile.setCreator(uploadusername);
             projectfile.setType(3L);
 
             fenhuoProjectfileService.save(projectfile);
@@ -361,6 +375,7 @@ public class FenhuoFaultController extends AbstractController {
         for(FenhuoProjectfileEntity relatedfile :filelist){
             String filename = relatedfile.getFilename();
             ProjectRelatedfileObj fileobj = new ProjectRelatedfileObj();
+            fileobj.setFileid(relatedfile.getFileid());
             fileobj.setUid(String.valueOf(filename.hashCode()));
             fileobj.setName(filename);
             filenames.add(fileobj);

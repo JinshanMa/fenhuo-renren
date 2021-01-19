@@ -180,7 +180,7 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
         FenhuoUsersEntity usersEntity = fenhuoUsersService.queryByUserId(faultEntity.getDeclarer());
         // 申报人姓名
         fenhuoFaultdefend.setCreaterid(faultEntity.getDeclarer());
-        fenhuoFaultdefend.setCreatername(usersEntity.getRealname());
+        fenhuoFaultdefend.setCreatername(faultEntity.getDeclarername());
         fenhuoFaultdefend.setHeadids(headids);
         fenhuoFaultdefend.setHeadnames(headnames);
         fenhuoFaultdefend.setProjectname(projectname);
@@ -445,6 +445,15 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    @Override
+    public void removeBySetisdeleted(String[] faultids) {
+        for(String faultid:faultids) {
+            FenhuoFaultEntity faultEntity = fenhuoFaultService.getById(faultid);
+            faultEntity.setIsdelete(1);
+            fenhuoFaultService.updateById(faultEntity);
         }
     }
 

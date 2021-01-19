@@ -1,0 +1,154 @@
+\begin{thebibliography}{10}
+
+\bibitem{2017ADeepLearning}
+Xu~Boning, Jiang Jinrong, Hao Huiqun, Lin Pengfei, and He~Dandanl.
+\newblock A deep learning model of enso prediction based on regional sea
+  surface temperature anomaly prediction.
+\newblock {\em E-science Technology \& Application}, 8(006):65--76, 2017.
+
+\bibitem{1999Athirdgen}
+N.~Booij, R.~C. Ris, and L.~H. Holthuijsen.
+\newblock A third-generation wave model for coastal regions 1. model
+  description and validation. j geophys res c oceans 104(c4):7649-7666.
+\newblock {\em Journal of Geophysical Research Atmospheres}, 104(4):7649--7666,
+  1999.
+
+\bibitem{1999A}
+N.~Booij, R.~C. Ris, and L.~H. Holthuijsen.
+\newblock A third-generation wave model for coastal regions 1. model
+  description and validation. j geophys res c oceans 104(c4):7649-7666.
+\newblock {\em Journal of Geophysical Research Atmospheres}, 104(4):7649--7666,
+  1999.
+
+\bibitem{2016Computational}
+L~Cuadra, S~Salcedo-Sanz, J.~C Nieto-Borge, E~Alexandre, and G~Rodriguez.
+\newblock Computational intelligence in wave energy: Comprehensive review and
+  case study.
+\newblock {\em Renewable and Sustainable Energy Reviews}, 58(May):1223--1246,
+  2016.
+
+\bibitem{2018Survey}
+Farnaz Fotovatikhah, Manuel Herrera, Shahaboddin Shamshirband, Kwok~Wing Chau,
+  Sina Faizollahzadeh~Ardabili, and Md.~Jalil Piran.
+\newblock Survey of computational intelligence as basis to big flood
+  management: challenges, research directions and future work.
+\newblock {\em Engineering Applications of Computational Fluid Mechanics},
+  12(1):411--437, 2018.
+
+\bibitem{swanprinciple}
+K.~Hasselmann and Dirk Olbers.
+\newblock Measurements of wind-wave growth and swell decay during the joint
+  north sea wave project (jonswap).
+\newblock {\em Erg{\"a}nzung zur Deut. Hydrogr. Z., Reihe A (8)}, 12:1--95,
+  1973.
+
+\bibitem{lstmtimeclassification}
+Fazle Karim, Somshubra Majumdar, Houshang Darabi, and Shun Chen.
+\newblock Lstm fully convolutional networks for time series classification.
+\newblock {\em IEEE Access}, 6:1662–1669, 2018.
+
+\bibitem{multilstmclassification}
+H.~U. Kelu, Zheng Chunlei, H.~E. Wei, Bao Xinghe, and Wang Yingguan.
+\newblock Multi-channels lstm networks for fence activity classification.
+\newblock {\em Ieice Transactions on Information \& Systems},
+  E101.D(8):2173--2177, 2018.
+
+\bibitem{2020Gait}
+Konrad Kluwak and Teodor Nizynski.
+\newblock Gait classification using lstm networks for tagging system.
+\newblock In {\em 2020 IEEE 15th International Conference of System of Systems
+  Engineering (SoSE)}, 2020.
+
+\bibitem{Komen1984On}
+Komen, G., J., Hasselmann, and K.
+\newblock On the existence of a fully developed wind-sea spectrum.
+\newblock {\em J. Phys. Oceanogr.}, 14(8):1271--1285, 1984.
+
+\bibitem{inproceedings2012}
+Alex Krizhevsky, I~Sutskever, and G~Hinton.
+\newblock Imagenet classification with deep convolutional neural networks.
+\newblock pages 1097--1105, 01 2012.
+
+\bibitem{2019electrity}
+GAO Kunlun, YANG Shuai, LIU~Si yan, and LI~Xiang wei.
+\newblock Transient stability assessment for power system based on
+  one-dimensional convolutional neural network.
+\newblock {\em Automation of Electric Power Systems}, 43(12):18.
+
+\bibitem{ZhuangLirong2018Text}
+Zhuang Lirong and Ye~Dongyi.
+\newblock Text sentiment classification based on cslstm neural network.
+\newblock {\em computer systems applications}, 027(002):230--235, 2018.
+
+\bibitem{2019WaveNet}
+Tong Liu, Yongle Zhang, Lin Qi, Junyu Dong, and Qi~Wen.
+\newblock Wavenet: learning to predict wave height and period from
+  accelerometer data using convolutional neural network.
+\newblock {\em IOP Conference Series Earth and Environmental Science},
+  369:012001, 2019.
+
+\bibitem{2011Evaluating}
+Iman Malekmohamadi, Mohammad~Reza Bazargan-Lari, Reza Kerachian, Mohammad~Reza
+  Nikoo, and Mahsa Fallahnia.
+\newblock Evaluating the efficacy of svms, bns, anns and anfis in wave height
+  prediction.
+\newblock {\em Ocean Engineering}, 38(2-3):487--497, 2011.
+
+\bibitem{windengtowave}
+John~W Miles.
+\newblock On the generation of surface waves by shear flows. iv.
+\newblock {\em Journal of Orthopaedic Science Official Journal of the Japanese
+  Orthopaedic Association}, 7014(20):70145S--70145S--9, 2015.
+
+\bibitem{2018Flood}
+Amir Mosavi, Pinar Ozturk, and Kwok~Wing Chau.
+\newblock Flood prediction using machine learning models: Literature review.
+\newblock {\em Water}, 10(11):1536, 2018.
+
+\bibitem{N1999A}
+N., Booij, R., C., Ris, L., H., and Holthuijsen.
+\newblock A third-generation wave model for coastal regions: 1. model
+  description and validation.
+\newblock {\em Journal of Geophysical Research}, 1999.
+
+\bibitem{2014Wave}
+Elena Pallares, Agustín Sánchez-Arcilla, and Manuel Espino.
+\newblock Wave energy balance in wave models (swan) for semi-enclosed domains:
+  application to the catalan coast.
+\newblock {\em Continental Shelf Research}, 87:41--53, 2014.
+
+\bibitem{2020Wind}
+Saeed Samadianfard, Sajjad Hashemi, Katayoun Kargar, Mojtaba Izadyar, and
+  Shahaboddin Shamshirband.
+\newblock Wind speed prediction using a hybrid model of the multi-layer
+  perceptron and whale optimization algorithm.
+\newblock {\em Energy Reports}, 6:1147--1159, 2020.
+
+\bibitem{2008Data}
+Dimitri~P. Solomatine and Avi Ostfeld.
+\newblock Data-driven modelling: some past experiences and new approaches.
+\newblock {\em Journal of Hydroinformatics}, 10(1):3--22, 2008.
+
+\bibitem{climateAnaysis}
+Guo Tingting, Gao Wenyang, Gao Yi, and Gong Feng.
+\newblock Analysis of climate characteristics in taiwan strait.
+\newblock {\em MARINE FORECASTS}, 27(1):53--58, 2010.
+
+\bibitem{2018Application}
+Zhu Xiaoying, Lai Shaohui, and Lu~Keda.
+\newblock Application of lstm algorithm in news classification.
+\newblock {\em Journal of Wuzhou University}, 2018.
+
+\bibitem{geoTaiwanStrait}
+Zhao Xuting.
+\newblock The geographical situation and navigation characteristics of the
+  taiwan strait.
+\newblock {\em Tianjin navigation}, (04):3--5, 1983.
+
+\bibitem{2017AGUFMG}
+Y.~{Zhang}, S.~C. {James}, and F.~{O'Donncha}.
+\newblock {A Machine LearningFramework to Forecast Wave Conditions}.
+\newblock In {\em AGU Fall Meeting Abstracts}, volume 2017, pages GC22B--02,
+  December 2017.
+
+\end{thebibliography}
