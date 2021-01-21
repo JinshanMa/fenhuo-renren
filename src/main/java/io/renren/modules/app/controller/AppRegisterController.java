@@ -88,6 +88,8 @@ public class AppRegisterController {
         user.setRemark(form.getRemark());
         user.setUniversity(form.getUniversity());
         user.setExperience(form.getExperience());
+        user.setCertificate(form.getCertificate());
+        user.setEducation(form.getEducation());
         user.setStatus("0");
 
         fenhuoUsersService.saveFenhuoUser(user);

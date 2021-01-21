@@ -35,11 +35,13 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
 
         String creatorname = (String)params.get("creatorname");
 
+        String filename = (String)params.get("filename");
+
 
         QueryWrapper<FenhuoProjectfileEntity>  queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>();
 
         if(StringUtils.isNotBlank(type)){
-            queryWrapper.and(wrapper->wrapper.ge("type",Long.parseLong(type)));
+            queryWrapper.and(wrapper->wrapper.eq("type",Long.parseLong(type)));
         }
         if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
             queryWrapper.and(wrapper->wrapper.ge("date_format(createdatetime,'%Y-%m-%d')",startDate)
@@ -54,6 +56,9 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
         }
         if(StringUtils.isNotBlank(creatorname)){
             queryWrapper.and(wrapper->wrapper.like("creator", creatorname));
+        }
+        if(StringUtils.isNotBlank(filename)){
+            queryWrapper.and(wrapper->wrapper.like("filename", filename));
         }
 
         queryWrapper.orderByDesc("fileid");
