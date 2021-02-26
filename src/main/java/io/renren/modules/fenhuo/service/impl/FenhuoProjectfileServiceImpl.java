@@ -39,7 +39,7 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
         QueryWrapper<FenhuoProjectfileEntity>  queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>();
 
         if(StringUtils.isNotBlank(type)){
-            queryWrapper.and(wrapper->wrapper.ge("type",Long.parseLong(type)));
+            queryWrapper.and(wrapper->wrapper.eq("type",Long.parseLong(type)));
         }
         if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
             queryWrapper.and(wrapper->wrapper.ge("date_format(createdatetime,'%Y-%m-%d')",startDate)

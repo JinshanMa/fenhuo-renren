@@ -29,6 +29,14 @@ public interface FenhuoZabbixhostService extends IService<FenhuoZabbixhostEntity
     boolean removeByIdsBySetIsDeleted(Long id);
 
 
-    JSONObject authrizedTestAndGetHosts(Map<String, Object> params);
+    boolean authrizedTest(Map<String, Object> params);
+
+    public JSONObject loginAndGetHostsByProjectid(Map<String, Object> params);
+
+    public JSONObject getItemsByhostid(Map<String, Object> params);
+
+    JSONObject zabbixGetItemHistory(String itemid, String auth, Integer id, long f, long t);
+
+//    public JSONObject getItemsByHostid(Map<String, Object> params);
 }
 

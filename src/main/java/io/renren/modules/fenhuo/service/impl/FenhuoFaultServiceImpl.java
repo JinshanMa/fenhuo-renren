@@ -1,5 +1,7 @@
 package io.renren.modules.fenhuo.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.mchange.lang.IntegerUtils;
 import io.renren.config.UploadFileConfig;
 import io.renren.modules.fenhuo.entity.*;
 import io.renren.modules.fenhuo.service.*;
@@ -229,6 +231,22 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     }
 
     @Override
+    public List<FenhuoProjectinfoEntity> queryProjectMsg(Map<String, Object> params) {
+        JSONObject projectsMsg = new JSONObject();
+        QueryWrapper<FenhuoProjectinfoEntity> query = new QueryWrapper<FenhuoProjectinfoEntity>().eq("isdelete", 0)
+                .and(wrapper->wrapper.eq("isactive", 1))
+                .and(StringUtils.isNotBlank((String)params.get("headid")), wrapper->wrapper.last(" headid REGEXP "+ getREPXEPContent((String)params.get("headid"))))
+                .and(StringUtils.isNotBlank((String)params.get("partyaid")), wrapper->wrapper.last("partyaid REGEXP "+ getREPXEPContent((String)params.get("partyaid"))))
+                .and(StringUtils.isNotBlank((String)params.get("servicemid")), wrapper->wrapper.last("servicemid REGEXP "+ getREPXEPContent((String)params.get("servicemid"))));
+        List<FenhuoProjectinfoEntity>  projectinfos = fenhuoProjectinfoService.list(query);
+
+//        for(FenhuoProjectinfoEntity info :projectinfos){
+//            projectsMsg.put(String.valueOf(info.getProjectid()), info.getProjectname());
+//        }
+        return projectinfos;
+    }
+
+    @Override
     public PageUtils queryPage(Map<String, Object> params) {
 //        String userid = (String)params.get("fenhuouserid");
         List<String> projectids = new ArrayList<String>();
@@ -264,12 +282,25 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
 //        }else {
 //            // 维护人员
 //        }
-        IPage<FenhuoFaultEntity> page = this.page(
-                new Query<FenhuoFaultEntity>().getPage(params),
-                new QueryWrapper<FenhuoFaultEntity>().eq("isdelete", 0)
-                        .and(wrapper->wrapper.eq("faultstatus", (String)params.get("faultType")))
-                        .and(projectids.size() > 0,wrapper -> wrapper.in("projectid", projectids))
-        );
+        String type = (String)params.get("faultType");
+        IPage<FenhuoFaultEntity> page = null;
+        if(type.equals("500")) {
+            page = this.page(
+                    new Query<FenhuoFaultEntity>().getPage(params),
+                    new QueryWrapper<FenhuoFaultEntity>().eq("isdelete", 0)
+                            .and(w->w.eq(StringUtils.isNotBlank(String.valueOf(params.get("projectid"))), "projectid", String.valueOf(params.get("projectid"))))
+                            .and(wrapper -> wrapper.eq("faultstatus", "500"))
+                            .and(projectids.size() > 0, wrapper -> wrapper.in("projectid", projectids))
+            );
+        }else{
+            page = this.page(
+                    new Query<FenhuoFaultEntity>().getPage(params),
+                    new QueryWrapper<FenhuoFaultEntity>().eq("isdelete", 0)
+                            .and(w->w.eq(StringUtils.isNotBlank(String.valueOf(params.get("projectid"))), "projectid", String.valueOf(params.get("projectid"))))
+                            .and(wrapper -> wrapper.ne("faultstatus", "500"))
+                            .and(projectids.size() > 0, wrapper -> wrapper.in("projectid", projectids))
+            );
+        }
 
         return new PageUtils(page);
     }
@@ -339,10 +370,11 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     }
 
     @Override
-    public void confirmToFaultdefend(FenhuoFaultdefendEntity faultDefend, Date beginDate, Date endate) {
+    public void confirmToFaultdefend(FenhuoFaultdefendEntity faultDefend, Date beginDate, Date endate, String plan) {
 //        FenhuoFaultdefendEntity fenhuoFaultdefend = fenhuoFaultdefendService.getById(faultDefend);
         faultDefend.setDefendstarttime(beginDate);
         faultDefend.setDefendstarttime(endate);
+        faultDefend.setPlan(plan);
         faultDefend.setDefendresult(1);
         fenhuoFaultdefendService.updateById(faultDefend);
     }
@@ -350,6 +382,11 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Override
     public void postvalidate(String faultid) {
         FenhuoFaultdefendEntity fenhuoFaultdefend = fenhuoFaultdefendService.getById(faultid);
+        String parentFaultid = fenhuoFaultdefend.getFaultid();
+        FenhuoFaultEntity faultEntity =  fenhuoFaultService.getById(parentFaultid);
+        faultEntity.setFaultstatus(505);
+        faultEntity.setFaultstatustxt(getSysConfig("505"));
+        fenhuoFaultService.updateById(faultEntity);
         fenhuoFaultdefend.setDefendresult(2);
         fenhuoFaultdefendService.updateById(fenhuoFaultdefend);
     }
@@ -357,6 +394,13 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Override
     public void passvalid(String faultid) {
         FenhuoFaultdefendEntity fenhuoFaultdefend = fenhuoFaultdefendService.getById(faultid);
+
+        String parentFaultid = fenhuoFaultdefend.getFaultid();
+        FenhuoFaultEntity faultEntity =  fenhuoFaultService.getById(parentFaultid);
+        faultEntity.setFaultstatus(502);
+        faultEntity.setFaultstatustxt(getSysConfig("502"));
+        fenhuoFaultService.updateById(faultEntity);
+
         fenhuoFaultdefend.setDefendresult(3);
         fenhuoFaultdefendService.updateById(fenhuoFaultdefend);
     }
@@ -364,6 +408,9 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Override
     public void validfail(String faultid) {
         FenhuoFaultdefendEntity fenhuoFaultdefend = fenhuoFaultdefendService.getById(faultid);
+
+
+
         fenhuoFaultdefend.setDefendresult(1);
         fenhuoFaultdefendService.updateById(fenhuoFaultdefend);
     }
@@ -371,6 +418,13 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
     @Override
     public void noideamaintain(String faultid) {
         FenhuoFaultdefendEntity fenhuoFaultdefend = fenhuoFaultdefendService.getById(faultid);
+
+        String parentFaultid = fenhuoFaultdefend.getFaultid();
+        FenhuoFaultEntity faultEntity =  fenhuoFaultService.getById(parentFaultid);
+        faultEntity.setFaultstatus(506);
+        faultEntity.setFaultstatustxt(getSysConfig("506"));
+        fenhuoFaultService.updateById(faultEntity);
+
         fenhuoFaultdefend.setDefendresult(-1);
         fenhuoFaultdefendService.updateById(fenhuoFaultdefend);
     }
@@ -454,6 +508,26 @@ public class FenhuoFaultServiceImpl extends ServiceImpl<FenhuoFaultDao, FenhuoFa
             FenhuoFaultEntity faultEntity = fenhuoFaultService.getById(faultid);
             faultEntity.setIsdelete(1);
             fenhuoFaultService.updateById(faultEntity);
+            QueryWrapper<FenhuoFaultdefendEntity> queryWrapper = new QueryWrapper<FenhuoFaultdefendEntity>();
+            queryWrapper.eq("faultid", faultid);
+            List<FenhuoFaultdefendEntity> defendlist = fenhuoFaultdefendService.list(queryWrapper);
+            FenhuoFaultdefendEntity faultdefend = defendlist.get(0);
+            faultdefend.setIsdelete(1);
+            fenhuoFaultdefendService.updateById(faultdefend);
+        }
+    }
+
+    @Override
+    public void removeBySetisdeletedByProjectid(String[] projectids) {
+        for(String projectid: projectids) {
+            QueryWrapper<FenhuoFaultEntity> queryWrapper = new QueryWrapper<FenhuoFaultEntity>();
+            queryWrapper.eq("projectid", projectid);
+            List<FenhuoFaultEntity> fenhuoFaults = list(queryWrapper);
+            List<String> faultids = new ArrayList<>();
+            for(FenhuoFaultEntity faultEntity: fenhuoFaults){
+                faultids.add(faultEntity.getFaultid());
+            }
+            removeBySetisdeleted(faultids.toArray(new String[]{}));
         }
     }
 

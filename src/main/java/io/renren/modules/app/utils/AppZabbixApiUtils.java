@@ -102,16 +102,37 @@ public class AppZabbixApiUtils {
         AppZabbixApiUtils utils = new AppZabbixApiUtils();
         JSONObject r = utils.zabbixLogin("Admin","Fire@2019");
 
+//        System.out.println(r);
+        System.out.print("-----------------------------------------------------------------------");
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(3000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        });
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        thread.start();
+//        JSONObject r3 = utils.zabbixLogin("Admin","Fire@2019");
+//        String result  = (String)r3.get("result");
+//        System.out.print(result);
+//        System.out.print(r3);
         String auth = r.getString("result");
         Integer id = r.getInteger("id");
-
-        //JSONObject r2 =  utils.zabbixGetHosts(auth,id);
-
-        JSONObject r3 =  utils.zabbixGetHostItems("10264",auth,id);
-
-        System.out.println(r3);
+//
+//        JSONObject r2 =  utils.zabbixGetHosts(auth,id);
+//
+//        JSONObject r3 =  utils.zabbixGetItemHistory("28687",auth,id);
+//
+//        System.out.println(r3);
     }
-
-
 
 }

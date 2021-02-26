@@ -420,4 +420,12 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
                 new QueryWrapper<FenhuoUsersEntity>().eq("userid", userId).eq("password", password));
     }
 
+    @Override
+    public boolean updatePassword(Long userId, String newPassword) {
+        FenhuoUsersEntity userEntity = new FenhuoUsersEntity();
+        userEntity.setPassword(newPassword);
+        return this.update(userEntity,
+                new QueryWrapper<FenhuoUsersEntity>().eq("userid", userId));
+    }
+
 }

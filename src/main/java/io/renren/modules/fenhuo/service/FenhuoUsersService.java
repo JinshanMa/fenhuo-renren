@@ -42,6 +42,7 @@ public interface FenhuoUsersService extends IService<FenhuoUsersEntity> {
     List<Long> queryAllMenuId(Long userId);
 
     boolean updatePassword(Long userId, String password, String newPassword);
+    boolean updatePassword(Long userId, String newPassword);
 
     FenhuoUsersEntity queryByMobile(String mobile);
     FenhuoUsersEntity queryByUserId(String userId);

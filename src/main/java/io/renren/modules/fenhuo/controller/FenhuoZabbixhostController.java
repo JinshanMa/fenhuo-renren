@@ -1,9 +1,8 @@
 package io.renren.modules.fenhuo.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,6 +11,7 @@ import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 import io.renren.modules.fenhuo.service.FenhuoUsersService;
 import io.renren.modules.sys.controller.AbstractController;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,11 +49,78 @@ public class FenhuoZabbixhostController extends AbstractController {
     @RequestMapping("/authAndgethosts")
     @RequiresPermissions("fenhuo:fenhuozabbixhost:authAndgethosts")
     public R authAndgethosts(@RequestParam Map<String, Object> params){
-        JSONObject hostsJsons = fenhuoZabbixhostService.authrizedTestAndGetHosts(params);
-        if(hostsJsons != null){
-            return R.ok().put("auth", "success").put("hosts", hostsJsons);
+        boolean islogined = fenhuoZabbixhostService.authrizedTest(params);
+        if(islogined){
+            return R.ok().put("auth", "success");
         }else {
             return R.error(400, "Not authorised");
+        }
+    }
+
+
+    @RequestMapping("/zabbixHostsByProjectid")
+    @RequiresPermissions("fenhuo:fenhuozabbixhost:hostsmessage")
+    public R hostsmessage(@RequestParam Map<String, Object> params){
+        JSONObject hostMsgObject = fenhuoZabbixhostService.loginAndGetHostsByProjectid(params);
+        if(hostMsgObject != null){
+            return R.ok().put("auth", "success").put("hosts", hostMsgObject.get("data")).put("authKey", hostMsgObject.get("auth")).put("id", hostMsgObject.get("id"));
+//            return R.ok().put("auth", "success");
+        }else {
+            return R.error(404, "zabbix username and password invalid or projectid id invalid");
+        }
+    }
+
+    @RequestMapping("/zabbixItemsByHostid")
+    @RequiresPermissions("fenhuo:fenhuozabbixhost:itemessages")
+    public R itemsmessage(@RequestParam Map<String, Object> params){
+        JSONObject itemsMsgObject = fenhuoZabbixhostService.getItemsByhostid(params);
+        if(itemsMsgObject != null){
+            return R.ok().put("auth", "success").put("items", itemsMsgObject);
+//            return R.ok().put("auth", "success");
+        }else {
+            return R.error(404, "zabbix username and password invalid or projectid id invalid");
+        }
+    }
+
+//    @RequestMapping("/zbxhostiteminfo")
+//    public R zabbixHostItemInfo(@RequestParam("itemid") String itemid,
+//                                @RequestParam("auth") String auth,
+//                                @RequestParam("id") Integer id,
+//                                @RequestParam("from") String from,
+//                                @RequestParam("till") String till){
+@RequestMapping("/zbxhostiteminfo")
+public R zabbixHostItemInfo(@RequestParam Map<String, Object> params){
+        String itemid = (String)params.get("itemid");
+        String auth = (String)params.get("auth");
+        String id = (String)params.get("id");
+        String from = (String)params.get("from");
+        String till = (String)params.get("till");
+
+        if(StringUtils.isNotBlank(itemid) &&
+                StringUtils.isNotBlank(auth) &&
+                StringUtils.isNotBlank(id) &&
+                StringUtils.isNotBlank(from) &&
+                StringUtils.isNotBlank(till)){
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
+            Date df = null;
+            Date tf = null;
+            try {
+                df = simpleDateFormat.parse(from);
+                tf = simpleDateFormat.parse(till);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            long f = df.getTime() / 1000;
+            long t = tf.getTime() / 1000;
+
+            JSONObject result = fenhuoZabbixhostService.zabbixGetItemHistory(itemid, auth, Integer.valueOf(id), f, t);
+
+//            return R.ok().put("history", result.get("history"));
+            return R.ok().put("history", result);
+        }else{
+            return R.error(500, "request parameter is not match!!!");
         }
     }
 

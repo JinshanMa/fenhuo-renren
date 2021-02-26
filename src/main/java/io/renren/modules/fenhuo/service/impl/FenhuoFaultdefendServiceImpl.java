@@ -123,6 +123,7 @@ public class FenhuoFaultdefendServiceImpl extends ServiceImpl<FenhuoFaultdefendD
             }
         }
 
+        original_wrapper.and(w->w.eq(StringUtils.isNotBlank(String.valueOf(params.get("projectid"))), "projectid", String.valueOf(params.get("projectid"))));
 
         ////
 
