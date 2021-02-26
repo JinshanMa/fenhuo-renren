@@ -35,6 +35,8 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
 
         String creatorname = (String)params.get("creatorname");
 
+        String filename = (String)params.get("filename");
+
 
         QueryWrapper<FenhuoProjectfileEntity>  queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>();
 
@@ -54,6 +56,9 @@ public class FenhuoProjectfileServiceImpl extends ServiceImpl<FenhuoProjectfileD
         }
         if(StringUtils.isNotBlank(creatorname)){
             queryWrapper.and(wrapper->wrapper.like("creator", creatorname));
+        }
+        if(StringUtils.isNotBlank(filename)){
+            queryWrapper.and(wrapper->wrapper.like("filename", filename));
         }
 
         queryWrapper.orderByDesc("fileid");

@@ -78,6 +78,11 @@ public class RegisterForm {
     @Nullable
     private String experience;
     /**
+     * 学历
+     */
+    @Nullable
+    private String education;
+    /**
      * 个人技能
      */
     @Nullable

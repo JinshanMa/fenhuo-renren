@@ -9,6 +9,8 @@ import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.service.FenhuoProjectfileService;
 import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.fenhuo.utils.ProjectRelatedfileObj;
+import io.renren.modules.sys.entity.SysConfigEntity;
+import io.renren.modules.sys.service.SysConfigService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.io.ResourceUtils;
@@ -22,10 +24,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("app/file")
@@ -36,6 +35,8 @@ public class AppFileController {
     @Autowired
     private UploadFileConfig uploadFileConfig;
 
+    @Autowired
+    private SysConfigService sysConfigService;
     /**
      * 列表
      */
@@ -101,7 +102,7 @@ public class AppFileController {
 
 
     @RequestMapping("/upload")
-    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type){
+    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type,@RequestParam("skilltype") long silltype,@RequestParam("creator") String creator){
 
 
         OpUtils opUtils = new OpUtils();
@@ -135,9 +136,17 @@ public class AppFileController {
                     projectfile.setProjectid(Integer.valueOf(id));
                 }
                 projectfile.setFilename(fileName);
+                projectfile.setCreator(creator);
+                projectfile.setCreatedatetime(new Date());
 
                 if (type == 1){
                     projectfile.setFilepath("/skill/");
+                    //paramKey
+                    QueryWrapper<SysConfigEntity> query =  new QueryWrapper<SysConfigEntity>().eq("paramKey", 0);
+                    SysConfigEntity configEntity = sysConfigService.getOne(query);
+                    projectfile.setTechcatalogid(Long.parseLong(configEntity.getParamKey()));
+                    projectfile.setTechcatalogname(configEntity.getParamValue());
+
                 }else if (type == 2){
                     projectfile.setFilepath("/proj_" + id + "/");
                 }else if (type == 3){
@@ -251,17 +260,16 @@ public class AppFileController {
 
 
     @RequestMapping("/filelist/")
-    public R listProjectfile(@RequestParam(value = "id",required = false) String id,@RequestParam("type") Long type){
+    public R listProjectfile(@RequestParam(value = "id",required = false) String id,@RequestParam("type") Long type,@RequestParam("filename") String filename){
 
 
-        QueryWrapper<FenhuoProjectfileEntity> queryWrapper = null;
+        QueryWrapper<FenhuoProjectfileEntity> queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>();
         if (StringUtils.isNotBlank(id)){
-            queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>()
-                    .eq("projectid", Integer.valueOf(id));
-            queryWrapper.and(wrapper->wrapper.eq("type", type));
-        }else {
-            queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>()
-                    .eq("type", type);
+            queryWrapper.eq("projectid", Integer.valueOf(id));
+        }
+        queryWrapper.and(wrapper->wrapper.eq("type", type));
+        if (StringUtils.isNotBlank(filename)){
+            queryWrapper.and(wrapper->wrapper.like("filename", filename));
         }
 
 

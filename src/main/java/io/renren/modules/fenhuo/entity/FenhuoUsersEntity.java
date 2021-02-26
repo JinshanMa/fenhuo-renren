@@ -120,6 +120,10 @@ public class FenhuoUsersEntity implements Serializable {
 	/**
 	 * 个人证书
 	 */
+	private String education;
+	/**
+	 * 个人证书
+	 */
 	private String certificate;
 	/**
 	 * 补充说明
