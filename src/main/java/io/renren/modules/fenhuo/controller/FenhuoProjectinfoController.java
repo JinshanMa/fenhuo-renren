@@ -447,7 +447,7 @@ public class FenhuoProjectinfoController extends AbstractController {
 //        }
 
         QueryWrapper<FenhuoProjectfileEntity> queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>()
-                .eq("projectid", Integer.valueOf(projectid));
+                .eq("projectid", Integer.valueOf(projectid)).and(r->r.eq("type", 2));
         List<FenhuoProjectfileEntity> filelist = fenhuoProjectfileService.list(queryWrapper);
         for(FenhuoProjectfileEntity relatedfile :filelist){
             String filename = relatedfile.getFilename();
