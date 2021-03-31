@@ -102,7 +102,7 @@ public class AppFileController {
 
 
     @RequestMapping("/upload")
-    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type,@RequestParam("skilltype") long silltype,@RequestParam("creator") String creator){
+    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type,@RequestParam(value = "skilltype",required = false) long silltype,@RequestParam(value = "creator",required = false) String creator){
 
 
         OpUtils opUtils = new OpUtils();
