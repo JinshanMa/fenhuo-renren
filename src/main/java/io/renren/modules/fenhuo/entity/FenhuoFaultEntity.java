@@ -1,5 +1,6 @@
 package io.renren.modules.fenhuo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -120,5 +121,27 @@ public class FenhuoFaultEntity implements Serializable {
 
 
 	private int isdelete;
+
+	@TableField(exist = false)
+	private String projectypeid;
+
+	@TableField(exist = false)
+	private String manager;
+	@TableField(exist = false)
+	private String aPartname;
+	@TableField(exist = false)
+	private String maintainnames;
+
+	@TableField(exist = false)
+	private String defendresult;
+
+	@TableField(exist = false)
+	private Date defendvisittime;
+	@TableField(exist = false)
+	private Date defendsetouttime;
+	@TableField(exist = false)
+	private Date defendstarttime;
+	@TableField(exist = false)
+	private Date defendendtime;
 
 }

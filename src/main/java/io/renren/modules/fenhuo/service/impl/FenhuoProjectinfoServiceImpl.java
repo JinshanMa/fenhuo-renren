@@ -3,9 +3,7 @@ package io.renren.modules.fenhuo.service.impl;
 import io.renren.config.UploadFileConfig;
 import io.renren.modules.fenhuo.entity.FenhuoProjectfileEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
-import io.renren.modules.fenhuo.service.FenhuoProjectfileService;
-import io.renren.modules.fenhuo.service.FenhuoUsersService;
-import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
+import io.renren.modules.fenhuo.service.*;
 import io.renren.modules.fenhuo.utils.JGPushUtil;
 import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.sys.entity.SysConfigEntity;
@@ -27,7 +25,6 @@ import io.renren.common.utils.Query;
 
 import io.renren.modules.fenhuo.dao.FenhuoProjectinfoDao;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
-import io.renren.modules.fenhuo.service.FenhuoProjectinfoService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +44,9 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
     @Autowired
     private FenhuoZabbixhostService fenhuoZabbixhostService;
+
+    @Autowired
+    private FenhuoFaultService fenhuoFaultService;
 
     @Autowired
     private UploadFileConfig uploadFileConfig;
@@ -92,13 +92,13 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
 
-        String keyword = (String)params.get("keyword");
+        String keyword = (String)params.get("projectname");
         String startDate = (String)params.get("startDate");
         String endDate = (String)params.get("endDate");
         String headid = (String)params.get("headid");
         String partyaid = (String)params.get("partyaid");
         String servicemid = (String)params.get("servicemid");
-        String type = (String)params.get("type");//类型id
+        String type = (String)params.get("projectype");//类型id
         String statu = (String)params.get("statu");//项目状态
 
         QueryWrapper<FenhuoProjectinfoEntity> queryWrapper = new QueryWrapper<>();
@@ -242,7 +242,10 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
             fenhuoProjectinfo.setIsdelete(1);
             updateById(fenhuoProjectinfo);
             fenhuoZabbixhostService.removeByIdsBySetIsDeleted(fenhuoProjectinfo.getProjectid());
+
         }
+        String[] projectids = idList.toArray(new String[]{});
+        fenhuoFaultService.removeBySetisdeletedByProjectid(projectids);
         return true;
     }
 
@@ -323,7 +326,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     }
 
     private FenhuoProjectinfoEntity processRequestObj(FenhuoProjectinfoEntity projectinfo){
-        String serviceId = String.valueOf(projectinfo.getServiceid());
+        String projectypeid = String.valueOf(projectinfo.getProjectypeid());
         String taskid = String.valueOf(projectinfo.getTaskid());
         String auditStatus = String.valueOf(projectinfo.getAuditstatus());
 
@@ -331,9 +334,9 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String partyaid = String.valueOf(projectinfo.getPartyaid());
         String servicemid = String.valueOf(projectinfo.getServicemid());
 
-        String serviceName = "";
-        if (!serviceId.equals("0")){
-            serviceName = getSysConfig(serviceId).getParamValue();
+        String projectypeName = "";
+        if (!projectypeid.equals("0")){
+            projectypeName = getSysConfig(projectypeid).getParamValue();
         }
 
         String taskName = getSysConfig(taskid).getParamValue();
@@ -343,7 +346,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         String partyAName = convertToStringName(getUsersMsg(partyaid));
         String serviceMName = convertToStringName(getUsersMsg(servicemid));
 
-
+        projectinfo.setProjectype(projectypeName);
         projectinfo.setServiceditemetail(projectinfo.getServiceditemetail());
         projectinfo.setTaskname(taskName);
         projectinfo.setHeadname(headNames);

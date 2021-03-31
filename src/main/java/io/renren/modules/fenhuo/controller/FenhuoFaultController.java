@@ -11,9 +11,7 @@ import com.google.gson.JsonObject;
 import io.renren.common.utils.DateUtils;
 import io.renren.config.UploadFileConfig;
 import io.renren.modules.fenhuo.entity.*;
-import io.renren.modules.fenhuo.service.FenhuoProjectfileService;
-import io.renren.modules.fenhuo.service.FenhuoUsersService;
-import io.renren.modules.fenhuo.service.FenhuoZabbixhostService;
+import io.renren.modules.fenhuo.service.*;
 import io.renren.modules.fenhuo.utils.OpUtils;
 import io.renren.modules.fenhuo.utils.ProjectRelatedfileObj;
 import io.renren.modules.fenhuo.utils.ZabbixApiUtils;
@@ -23,7 +21,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import io.renren.modules.fenhuo.service.FenhuoFaultService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +43,9 @@ public class FenhuoFaultController extends AbstractController {
     private FenhuoFaultService fenhuoFaultService;
 
     @Autowired
+    private FenhuoFaultdefendService fenhuoFaultdefendService;
+
+    @Autowired
     private FenhuoUsersService fenhuoUsersService;
 
     @Autowired
@@ -59,6 +59,45 @@ public class FenhuoFaultController extends AbstractController {
 
     @Autowired
     private FenhuoProjectfileService fenhuoProjectfileService;
+
+    @Autowired
+    private FenhuoProjectinfoService fenhuoProjectinfoService;
+
+    /**
+     * 获取所有项目详细
+     */
+    @RequestMapping("/projectslist")
+    @RequiresPermissions("fenhuo:fenhuofault:list")
+    public R projectsList(@RequestParam Map<String, Object> params){
+
+        Object userObj = getUser();
+        String fenhuouserId;
+        FenhuoUsersEntity fenhuouser = null;
+        if (userObj instanceof SysUserEntity){
+            SysUserEntity sysuser = (SysUserEntity)userObj;
+            fenhuouserId = String.valueOf(-sysuser.getUserId());
+        } else {
+            fenhuouser = (FenhuoUsersEntity)userObj;
+            fenhuouserId = String.valueOf(fenhuouser.getUserid());
+        }
+        Long longuserid = Long.valueOf(fenhuouserId);
+        if(longuserid > 0) {
+            String roleid = fenhuouser.getRoleid();
+            if(roleid.equals("2")){
+                //项目负责人
+                params.put("headid", fenhuouserId);
+            }else if(roleid.equals("1")){
+                //甲方负责人
+                params.put("partyaid", fenhuouserId);
+            }else if(roleid.equals("3")){
+                //维护工程师
+                params.put("servicemid", fenhuouserId);
+            }
+        }
+        List<FenhuoProjectinfoEntity> projectMsg = fenhuoFaultService.queryProjectMsg(params);
+
+        return R.ok().put("projectmsg", projectMsg);
+    }
 
     /**
      * 列表
@@ -120,20 +159,23 @@ public class FenhuoFaultController extends AbstractController {
         Set<String> hashset = new HashSet<>(list);
 
         String[] hostidArray = hashset.toArray(new String[]{});
-        zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
-        JSONObject jsonData = zabbixApiUtils.getDataBySingleParamArray("host.get", "hostids",hostidArray);
+        JSONObject loginresult = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
+        String auth = loginresult.getString("result");
+        Integer id = loginresult.getInteger("id");
+
+        JSONObject jsonData = zabbixApiUtils.zabbixGetHosts(auth, id);
 
         JSONArray hostarray = (JSONArray)jsonData.get("result");
-        JSONArray retJsonArray = new JSONArray();
-        for(int i = 0;i < hostarray.size();i++){
-            String hostid = (String)hostarray.getJSONObject(i).get("hostid");
-            String hostname = (String)hostarray.getJSONObject(i).get("host");
-            JSONObject jsobj = new JSONObject();
-            jsobj.put("hostid", hostid);
-            jsobj.put("hostname", hostname);
-            retJsonArray.add(jsobj);
-        }
-        return  R.ok().put("zbxarray", retJsonArray);
+//        JSONArray retJsonArray = new JSONArray();
+//        for(int i = 0;i < hostarray.size();i++){
+//            String hostid = (String)hostarray.getJSONObject(i).get("hostid");
+//            String hostname = (String)hostarray.getJSONObject(i).get("host");
+//            JSONObject jsobj = new JSONObject();
+//            jsobj.put("hostid", hostid);
+//            jsobj.put("hostname", hostname);
+//            retJsonArray.add(jsobj);
+//        }
+        return  R.ok().put("zbxarray", hostarray);
     }
 
 
@@ -145,6 +187,24 @@ public class FenhuoFaultController extends AbstractController {
     public R info(@PathVariable("faultid") String faultid){
 		FenhuoFaultEntity fenhuoFault = fenhuoFaultService.getById(faultid);
 
+        String projectid = fenhuoFault.getProjectid();
+        QueryWrapper<FenhuoFaultdefendEntity> queryWrapper = new QueryWrapper<FenhuoFaultdefendEntity>();
+        queryWrapper.eq("faultid", faultid);
+        FenhuoFaultdefendEntity faultdefendEntity = fenhuoFaultdefendService.getOne(queryWrapper);
+        FenhuoProjectinfoEntity fenhuoProjectinfoEntity = fenhuoProjectinfoService.getById(projectid);
+        Integer projectypeid = fenhuoProjectinfoEntity.getProjectypeid();
+
+        fenhuoFault.setAPartname(fenhuoProjectinfoEntity.getPartyaname());
+        fenhuoFault.setManager(fenhuoProjectinfoEntity.getHeadname());
+        fenhuoFault.setPlan(faultdefendEntity.getPlan());
+        fenhuoFault.setMaintainnames(fenhuoProjectinfoEntity.getServicemname());
+        fenhuoFault.setDefendresult(String.valueOf(faultdefendEntity.getDefendresult()));
+        fenhuoFault.setProjectypeid(String.valueOf(projectypeid));
+
+        fenhuoFault.setDefendvisittime(faultdefendEntity.getDefendvisittime());
+        fenhuoFault.setDefendsetouttime(faultdefendEntity.getDefendsetouttime());
+        fenhuoFault.setDefendstarttime(faultdefendEntity.getDefendstarttime());
+        fenhuoFault.setDefendendtime(faultdefendEntity.getDefendendtime());
         return R.ok().put("fenhuoFault", fenhuoFault);
     }
 
@@ -218,7 +278,8 @@ public class FenhuoFaultController extends AbstractController {
 
             Date beginDate = DateUtils.stringToDate((String) params.get("begindate"), DateUtils.DATE_TIME_PATTERN);
             Date endate = DateUtils.stringToDate((String) params.get("endate"), DateUtils.DATE_TIME_PATTERN);
-            fenhuoFaultService.confirmToFaultdefend(faultdefend, beginDate, endate);
+            String plan = (String)params.get("plan");
+            fenhuoFaultService.confirmToFaultdefend(faultdefend, beginDate, endate, plan);
         } else if(action.equals("postvalidate")){
             String faultid = (String) params.get("faultid");
             fenhuoFaultService.postvalidate(faultid);
@@ -264,7 +325,17 @@ public class FenhuoFaultController extends AbstractController {
                                @RequestParam("deleteFiles") String[] delFileIds,
                                @RequestParam("files") MultipartFile[] files){
         OpUtils opUtils = new OpUtils();
-        String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
+
+        String opPath = opUtils.getPath();
+        if (!opUtils.getPath().endsWith("/")){
+            opPath += "/";
+        }
+
+        String projuploadir = opPath + uploadFileConfig.getLocaluploadpath();
+
+        if (projuploadir.contains("file:")){
+            projuploadir = projuploadir.replace("file:","");
+        }
 
 //        System.out.println("delFilenames.length:" + delFilenames.length);
 //        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));

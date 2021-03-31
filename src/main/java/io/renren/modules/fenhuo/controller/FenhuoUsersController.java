@@ -12,7 +12,9 @@ import io.renren.modules.oss.cloud.OSSFactory;
 import io.renren.modules.oss.entity.SysOssEntity;
 import io.renren.modules.sys.controller.AbstractController;
 import io.renren.modules.sys.service.SysUserRoleService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.http.HttpRequest;
@@ -94,7 +96,15 @@ public class FenhuoUsersController extends AbstractController {
     @RequestMapping("/update")
     @RequiresPermissions("fenhuo:fenhuousers:update")
     public R update(@RequestBody FenhuoUsersEntity fenhuoUsers){
-		fenhuoUsersService.updateById(fenhuoUsers);
+        fenhuoUsersService.updateById(fenhuoUsers);
+        FenhuoUsersEntity dbfenhuouser = fenhuoUsersService.getById(fenhuoUsers.getUserid());
+        if(StringUtils.isNotBlank(fenhuoUsers.getPassword())){
+            String newpassword = fenhuoUsers.getPassword();
+            //sha256加密
+            String newHexPassword = new Sha256Hash(newpassword, dbfenhuouser.getSalt()).toHex();
+            fenhuoUsersService.updatePassword(fenhuoUsers.getUserid(), newHexPassword);
+        }
+
 
         return R.ok();
     }

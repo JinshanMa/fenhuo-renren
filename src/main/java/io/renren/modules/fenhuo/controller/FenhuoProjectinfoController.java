@@ -178,15 +178,16 @@ public class FenhuoProjectinfoController extends AbstractController {
         String[] hostidsArray = hostids.split(",");
         String[] hostnamesArray = hostnames.split(",");
 
-        if(zabbixApiUtils.zabbixLogin(username,password)){
-            JSONArray result = zabbixApiUtils.zbxApiUsage(itemname, hostidsArray, hostnamesArray);
-            return R.ok().put("zbxdata", result);
-        } else {
-            JSONObject errordata = new JSONObject();
-//            errordata.put("msg", "zabbix username or password error!");
-            return R.error().put("msg", "zabbix username or password error!");
-//            return R.error().put("prozbx", jsonData);
-        }
+//        if(zabbixApiUtils.zabbixLogin(username,password)){
+//            JSONArray result = zabbixApiUtils.zbxApiUsage(itemname, hostidsArray, hostnamesArray);
+//            return R.ok().put("zbxdata", result);
+//        } else {
+//            JSONObject errordata = new JSONObject();
+////            errordata.put("msg", "zabbix username or password error!");
+//            return R.error().put("msg", "zabbix username or password error!");
+////            return R.error().put("prozbx", jsonData);
+//        }
+        return R.ok();
     }
 
 
@@ -316,8 +317,16 @@ public class FenhuoProjectinfoController extends AbstractController {
                                @RequestParam("deleteFiles") String[] delFileIds,
                                @RequestParam("files") MultipartFile[] files){
         OpUtils opUtils = new OpUtils();
-        String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
 
+        String opPath = opUtils.getPath();
+        if (!opUtils.getPath().endsWith("/")){
+            opPath += "/";
+        }
+
+        String projuploadir = opPath + uploadFileConfig.getLocaluploadpath();
+        if (projuploadir.contains("file:")){
+            projuploadir = projuploadir.replace("file:","");
+        }
 //        System.out.println("delFilenames.length:" + delFilenames.length);
 //        FenhuoProjectinfoEntity projectinfo = fenhuoProjectinfoService.getById(Long.valueOf(projectid));
 
@@ -332,6 +341,7 @@ public class FenhuoProjectinfoController extends AbstractController {
 //            List<String> totalpaths = new ArrayList<String>(Arrays.asList(projectinfo.getFileurl().split(OpUtils.getSplitNotation())));
             for (String deletingFileId: delFileIds){
                 FenhuoProjectfileEntity relatedFile = fenhuoProjectfileService.getById(deletingFileId);
+                if (relatedFile != null){
                 String deletingFilepath = projuploadir + relatedFile.getFilepath() + relatedFile.getFilename();
                 File file = new File(deletingFilepath);
                 if(file.exists()){
@@ -349,6 +359,7 @@ public class FenhuoProjectinfoController extends AbstractController {
 //                        break;
 //                    }
 //                }
+                }
             }
         }
         for (MultipartFile file : files) {
@@ -383,6 +394,7 @@ public class FenhuoProjectinfoController extends AbstractController {
             String projectFileDir = projuploadir + projectfile.getFilepath();
             File projectUploadFileDir = new File(projectFileDir);
             if (!projectUploadFileDir.exists()) {
+                System.out.println("projectuploadfile:" + projectFileDir);
                 boolean ok = projectUploadFileDir.mkdir();
                 if (!ok) {
                     return R.error().put("msg", "project Upload directory can not create!");
@@ -435,7 +447,7 @@ public class FenhuoProjectinfoController extends AbstractController {
 //        }
 
         QueryWrapper<FenhuoProjectfileEntity> queryWrapper = new QueryWrapper<FenhuoProjectfileEntity>()
-                .eq("projectid", Integer.valueOf(projectid));
+                .eq("projectid", Integer.valueOf(projectid)).and(r->r.eq("type", 2));
         List<FenhuoProjectfileEntity> filelist = fenhuoProjectfileService.list(queryWrapper);
         for(FenhuoProjectfileEntity relatedfile :filelist){
             String filename = relatedfile.getFilename();

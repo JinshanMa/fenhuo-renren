@@ -10,10 +10,14 @@ import io.github.hengyunabc.zabbix.api.RequestBuilder;
 import io.github.hengyunabc.zabbix.api.ZabbixApi;
 import io.renren.common.utils.R;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component("zabbixApiUtils")
@@ -37,23 +41,99 @@ public class ZabbixApiUtils {
 //        zabbixLogin("Admin","Fire@2019");
     }
 
-    public boolean zabbixLogin(String usename, String password){
-
-        boolean loginResult = zabbixApi.login(usename, password);
-//        System.out.println(loginResult);
-
-        return loginResult;
-    }
-
-    public JSONObject getDataBySingleParam(String method, String paramkeyname, JSONObject filter){
+//    public boolean zabbixLogin(String usename, String password){
+//
+//        boolean loginResult = zabbixApi.login(usename, password);
+////        System.out.println(loginResult);
+//
+//        return loginResult;
+//    }
+    /**
+     * 登录
+     * @param username
+     * @param pwd
+     * @return
+     */
+    public JSONObject zabbixLogin(String username,String pwd){
         Request getRequest = RequestBuilder.newBuilder()
-                .method(method)
-                .paramEntry(paramkeyname, filter)
+                .version("2.0")
+                .method("user.login")
+                .paramEntry("user", username)
+                .paramEntry("password", pwd)
                 .build();
         JSONObject getResponse = zabbixApi.call(getRequest);
-//        System.out.println(getResponse);
         return getResponse;
     }
+
+    /**
+     * 获取账号下主机
+     * @param auth
+     * @param id
+     * @return
+     */
+    public JSONObject zabbixGetHosts(String auth,Integer id){
+        String[] output = {"hostid","name"};
+        Request getRequest = RequestBuilder.newBuilder()
+                .version("2.0")
+                .method("host.get")
+                .paramEntry("output", output)
+                .auth(auth)
+                .id(id)
+                .build();
+        JSONObject getResponse = zabbixApi.call(getRequest);
+        return getResponse;
+    }
+
+
+    /**
+     * 获取主机所有监控项
+     * @param hostid
+     * @param auth
+     * @param id
+     * @return
+     */
+    public JSONObject zabbixGetHostItems(String hostid,String auth,Integer id){
+        String[] output = {"itemids","key_"};
+        Request getRequest = RequestBuilder.newBuilder()
+                .version("2.0")
+                .method("item.get")
+                .paramEntry("output", output)
+                .paramEntry("hostids", hostid)
+                .paramEntry("monitored", true)
+                .auth(auth)
+                .id(id)
+                .build();
+        JSONObject getResponse = zabbixApi.call(getRequest);
+        return getResponse;
+    }
+
+    public JSONObject zabbixGetItemHistory(String itemids,String auth,Integer id,long from,long till){
+        Request getRequest = RequestBuilder.newBuilder()
+                .version("2.0")
+                .method("history.get")
+                .paramEntry("output", "extend")
+                .paramEntry("itemids", itemids)
+                .paramEntry("time_from", from)
+                .paramEntry("time_till", till)
+                .paramEntry("sortfield", "clock")
+                .paramEntry("limit",30)
+                .auth(auth)
+                .id(id)
+                .build();
+        JSONObject getResponse = zabbixApi.call(getRequest);
+        return getResponse;
+    }
+
+
+//    public JSONObject getDataBySingleParam(String method, String paramkeyname, JSONObject filter){
+//        Request getRequest = RequestBuilder.newBuilder()
+//                .method(method)
+//                .paramEntry(paramkeyname, filter)
+//                .build();
+//        JSONObject getResponse = zabbixApi.call(getRequest);
+////        System.out.println(getResponse);
+//        return getResponse;
+//    }
     public JSONObject getDataBySingleParamArray(String method, String paramkeyname, String[] data){
         Request getRequest = RequestBuilder.newBuilder()
                 .method(method)
@@ -157,63 +237,6 @@ public class ZabbixApiUtils {
 
 
 
-    public static void main3(String[] args){
-
-        ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
-
-
-        boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
-
-
-        JSONArray resarray = zabbixApiUtils.zbxApiItemGet("system.cpu.util[,user]", new String[]{"10264"});
-//        JSONArray resarray = zabbixApiUtils.zbxApiUsage("hddusage",new String[]{"10264"}, new String[]{"江民测试服"});
-
-
-        String historyprettyjson = JSON.toJSONString(resarray, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-                SerializerFeature.WriteDateUseDateFormat);
-        try {
-            writetojson(historyprettyjson);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(resarray.size());
-
-    }
-
-    public static void main4(String[] args){
-
-        ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
-
-
-        boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
-
-
-//        JSONArray resarray = zabbixApiUtils.zbxApiItemGet("system.cpu.util[,user]", new String[]{"10264"});
-        JSONArray resarray = zabbixApiUtils.zbxApiUsage("ifusage",new String[]{"10264"}, new String[]{"江民测试服2"});
-
-
-        String historyprettyjson = JSON.toJSONString(resarray, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-                SerializerFeature.WriteDateUseDateFormat);
-//        try {
-//            writetojson(historyprettyjson);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        System.out.println(resarray.size());
-
-    }
-
-    public static void main(String[] args) {
-        ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
-
-
-        boolean anotherOk = zabbixApiUtils.zabbixLogin("Admin","Fire@2019");
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("hostids", new String[] {"10084","10264"});
-
-        System.out.println(zabbixApiUtils.getDataBySingleParamArray("host.get", "hostids",new String[] {"10084","10264","10267","10270"}));
-    }
 
 
     private static void writetojson(String content) throws IOException {
@@ -235,6 +258,12 @@ public class ZabbixApiUtils {
 
         System.out.println("finish");
 
+    }
+
+    public static void main(String[] args) {
+        ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
+        JSONObject ret = zabbixApiUtils.zabbixLogin("a", "b");
+        System.out.print(ret);
     }
 
 

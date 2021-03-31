@@ -92,6 +92,7 @@ public class FenhuoOperationlogServiceImpl extends ServiceImpl<FenhuoOperationlo
                 queryChild.and(wrapper -> wrapper.in("projectid", typeidList));
             }
         }
+        queryChild.orderByDesc("logid");
 
 
         IPage<FenhuoOperationlogEntity> page = this.page(

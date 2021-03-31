@@ -114,7 +114,18 @@ public class FenhuoProjectfileController extends AbstractController {
     public R delete(@RequestBody Long[] fileids){
 
         OpUtils opUtils = new OpUtils();
-        String projuploadir = opUtils.getPath() + uploadFileConfig.getLocaluploadpath();
+
+        String opPath = opUtils.getPath();
+        if (!opUtils.getPath().endsWith("/")) {
+            opPath += "/";
+        }
+
+
+        String projuploadir = opPath + uploadFileConfig.getLocaluploadpath();
+
+        if (projuploadir.contains("file:")){
+            projuploadir = projuploadir.replace("file:","");
+        }
 
         for (Long fileid: fileids){
             FenhuoProjectfileEntity projectfileEntity = fenhuoProjectfileService.getById(fileid);
@@ -200,6 +211,12 @@ public class FenhuoProjectfileController extends AbstractController {
                 projectfile.setCreator(uploadusername);
                 projectfile.setType(type);
 
+                QueryWrapper<FenhuoProjectfileEntity> projectfilequery = new QueryWrapper<FenhuoProjectfileEntity>();
+                projectfilequery.eq("filename", projectfile.getFilename()).and(r->r.eq("filepath", projectfile.getFilepath()));
+                List<FenhuoProjectfileEntity> exsistedlist = fenhuoProjectfileService.list(projectfilequery);
+                if(exsistedlist.size() > 0){
+                    return R.error(500,"相同文件名已存在");
+                }
 
                 //System.out.println("---------projectid: " + id + "-----UploadFileConfig.getLocaluploadpath():" + uploadFileConfig.getLocaluploadpath());
 
@@ -210,6 +227,7 @@ public class FenhuoProjectfileController extends AbstractController {
 
                 File projectUploadFileDir = new File(projectFileDir);
                 if (!projectUploadFileDir.exists()) {
+                    System.out.println("skillupload:" + projectFileDir);
                     boolean ok = projectUploadFileDir.mkdir();
                     if (!ok) {
                         //故障附件是多个上传
@@ -222,6 +240,7 @@ public class FenhuoProjectfileController extends AbstractController {
 
                 File dest = new File(projectFileDir + fileName);
                 if (dest.exists()){
+
                     return R.error(500,"相同文件名已存在");
                 }else{
                     fenhuoProjectfileService.save(projectfile);
@@ -232,8 +251,6 @@ public class FenhuoProjectfileController extends AbstractController {
                         e.printStackTrace();
                     }
                 }
-
-
             }
 //        }
 
