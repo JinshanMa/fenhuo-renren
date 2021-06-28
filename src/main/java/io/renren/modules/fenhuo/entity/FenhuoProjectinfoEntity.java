@@ -1,5 +1,6 @@
 package io.renren.modules.fenhuo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -168,6 +169,16 @@ public class FenhuoProjectinfoEntity implements Serializable {
 	 * 项目类型名称
 	 */
 	private Integer projectypeid;
+
+	/**
+	 * 项目属于哪个zabbix服务器上
+	 */
+	private Integer zabbixmngid;
+
+	/**
+	 * 项目属于哪个zabbix服务器的主机名称
+	 */
+	private String zabbixname;
 
 	/**
 	 * 最近一次关闭时间

@@ -199,8 +199,8 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     public boolean saveProjectInfo(FenhuoProjectinfoEntity projectinfo) {
         if (projectinfo != null){
 //            processRequestObj(projectinfo);
-            if (projectinfo.getHeadid() != null && projectinfo.getHeadname() != null){
-                if (projectinfo.getAuditstatus() == 101){
+            if (projectinfo.getHeadid() != null && projectinfo.getHeadname() != null) {
+                if (projectinfo.getAuditstatus() == 101) {
                     String[] headids = projectinfo.getHeadid().split(",");
                     String[] headnames = projectinfo.getHeadname().split(",");
                     FenhuoUsersEntity userHead = fenhuoUsersService.queryByUserId(headids[0]);
@@ -208,12 +208,12 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
                     //通知所有系统管理员
                     List<SysUserEntity> sysUsers = sysUserService.list();
-                    for (SysUserEntity sysUserEntity: sysUsers){
-                        if (sysUserEntity.getPushid() != null){
-                            if (headnames.length > 0){
+                    for (SysUserEntity sysUserEntity : sysUsers) {
+                        if (sysUserEntity.getPushid() != null) {
+                            if (headnames.length > 0) {
                                 String title = headnames[0] + "申请创建项目";
                                 String content = "项目管理员:" + headnames[0] + ",申请创建项目：" + projectinfo.getProjectname();
-                                JGPushUtil.pushMsgByRegID(sysUserEntity.getPushid(),title,content,null);
+                                JGPushUtil.pushMsgByRegID(sysUserEntity.getPushid(), title, content, null);
                             }
 
                         }
@@ -222,7 +222,6 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
                 }
 
             }
-
 
             projectinfo.setIsactive(0);
             save(processRequestObj(projectinfo));
@@ -327,6 +326,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
     private FenhuoProjectinfoEntity processRequestObj(FenhuoProjectinfoEntity projectinfo){
         String projectypeid = String.valueOf(projectinfo.getProjectypeid());
+//        String zabbixmngid = String.valueOf(projectinfo.getZabbixmngid());
         String taskid = String.valueOf(projectinfo.getTaskid());
         String auditStatus = String.valueOf(projectinfo.getAuditstatus());
 
@@ -353,7 +353,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
         projectinfo.setPartyaname(partyAName);
         projectinfo.setServicemname(serviceMName);
         projectinfo.setAuditname(audiName);
-
+//        projectinfo.setZabbixmngid();
         projectinfo.setProjectcreatetime(new Date());
         projectinfo.setIsdelete(0);
 
