@@ -102,7 +102,7 @@ public class AppFileController {
 
 
     @RequestMapping("/upload")
-    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type,@RequestParam("skilltype") long silltype,@RequestParam("creator") String creator){
+    public R uploadRelatedFile(HttpServletRequest request, @RequestParam(value = "id",required = false) String id, @RequestParam("type") long type,@RequestParam(value = "skilltype",required = false) long skilltype,@RequestParam(value = "creator",required = false) String creator){
 
 
         OpUtils opUtils = new OpUtils();
@@ -142,7 +142,7 @@ public class AppFileController {
                 if (type == 1){
                     projectfile.setFilepath("/skill/");
                     //paramKey
-                    QueryWrapper<SysConfigEntity> query =  new QueryWrapper<SysConfigEntity>().eq("paramKey", 0);
+                    QueryWrapper<SysConfigEntity> query =  new QueryWrapper<SysConfigEntity>().eq("param_key", skilltype);
                     SysConfigEntity configEntity = sysConfigService.getOne(query);
                     projectfile.setTechcatalogid(Long.parseLong(configEntity.getParamKey()));
                     projectfile.setTechcatalogname(configEntity.getParamValue());
