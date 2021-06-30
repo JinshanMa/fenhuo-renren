@@ -243,6 +243,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
             updateById(fenhuoProjectinfo);
             fenhuoZabbixhostService.removeByIdsBySetIsDeleted(fenhuoProjectinfo.getProjectid());
 
+            //fenhuoZabbixhostService.removeById(fenhuoProjectinfo.getProjectid());
         }
         String[] projectids = idList.toArray(new String[]{});
         fenhuoFaultService.removeBySetisdeletedByProjectid(projectids);
