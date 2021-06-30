@@ -234,16 +234,13 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
     @Override
     public boolean removeByIdsBySetIsDeleted(Collection<? extends Serializable> idList) {
 
-        Iterator iters = idList.iterator();
-        while (iters.hasNext()) {
-            Long detetingId = Long.parseLong((String) iters.next());
-            FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
-            fenhuoProjectinfo.setIsdelete(1);
-            updateById(fenhuoProjectinfo);
-            fenhuoZabbixhostService.removeByIdsBySetIsDeleted(fenhuoProjectinfo.getProjectid());
-
-            //fenhuoZabbixhostService.removeById(fenhuoProjectinfo.getProjectid());
-        }
+//        Iterator iters = idList.iterator();
+//        while (iters.hasNext()) {
+//            Long detetingId = Long.parseLong((String) iters.next());
+//            FenhuoProjectinfoEntity fenhuoProjectinfo = getById(detetingId);
+//            //fenhuoProjectinfo.setIsdelete(1);
+//            //updateById(fenhuoProjectinfo);
+//        }
         String[] projectids = idList.toArray(new String[]{});
         fenhuoFaultService.removeBySetisdeletedByProjectid(projectids);
         return true;
@@ -340,7 +337,11 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
             projectypeName = getSysConfig(projectypeid).getParamValue();
         }
 
-        String taskName = getSysConfig(taskid).getParamValue();
+        if (taskid!=null && taskid!="" && taskid!="null"){
+            String taskName = getSysConfig(taskid).getParamValue();
+            projectinfo.setTaskname(taskName);
+        }
+
         String audiName = getSysConfig(auditStatus).getParamValue();
 
         String headNames = convertToStringName(getUsersMsg(headid));
@@ -349,7 +350,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
 
         projectinfo.setProjectype(projectypeName);
         projectinfo.setServiceditemetail(projectinfo.getServiceditemetail());
-        projectinfo.setTaskname(taskName);
+
         projectinfo.setHeadname(headNames);
         projectinfo.setPartyaname(partyAName);
         projectinfo.setServicemname(serviceMName);

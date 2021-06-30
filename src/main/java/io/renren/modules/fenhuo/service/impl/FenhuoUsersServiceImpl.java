@@ -230,8 +230,9 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         while (iters.hasNext()) {
             Long detetingId = Long.parseLong((String) iters.next());
             FenhuoUsersEntity fenhuoUser = getById(detetingId);
-            fenhuoUser.setIsdelete(1);
-            updateById(fenhuoUser);
+            fenhuoUsersService.removeById(detetingId);
+//            fenhuoUser.setIsdelete(1);
+//            updateById(fenhuoUser);
         }
         return true;
     }
