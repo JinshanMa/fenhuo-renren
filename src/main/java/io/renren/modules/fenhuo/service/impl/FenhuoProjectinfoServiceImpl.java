@@ -337,7 +337,7 @@ public class FenhuoProjectinfoServiceImpl extends ServiceImpl<FenhuoProjectinfoD
             projectypeName = getSysConfig(projectypeid).getParamValue();
         }
 
-        if (taskid!=null && taskid!="" && taskid!="null"){
+        if (taskid!=null && taskid!="" && taskid!="null" && taskid!="0"){
             String taskName = getSysConfig(taskid).getParamValue();
             projectinfo.setTaskname(taskName);
         }
