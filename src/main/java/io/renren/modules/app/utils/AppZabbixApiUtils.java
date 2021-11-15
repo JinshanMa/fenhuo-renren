@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class AppZabbixApiUtils {
 
 
-    private String zabbixUrl = "http://114.116.19.246/zabbix/api_jsonrpc.php";
+    private String zabbixUrl = "http://124.71.84.163/index.php";
     private ZabbixApi zabbixApi;
 
     public AppZabbixApiUtils() {
