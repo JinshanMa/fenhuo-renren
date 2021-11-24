@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class AppZabbixApiUtils {
 
 
-    private String zabbixUrl = "http://124.71.84.163/index.php";
+    private String zabbixUrl = "http://124.71.84.163/zabbix/api_jsonrpc.php";
     private ZabbixApi zabbixApi;
 
     public AppZabbixApiUtils() {
@@ -26,6 +26,8 @@ public class AppZabbixApiUtils {
      * @return
      */
     public JSONObject zabbixLogin(String username,String pwd){
+
+
         Request getRequest = RequestBuilder.newBuilder()
                 .version("2.0")
                 .method("user.login")
