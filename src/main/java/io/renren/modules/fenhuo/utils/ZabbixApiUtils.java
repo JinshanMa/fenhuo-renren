@@ -32,7 +32,8 @@ public class ZabbixApiUtils {
     private final String NET_OUT_USAGE_KEY = "net.if.out";
 
     private final int HISTORY_LIMIT_COUNT = 10;
-    private String zabbixUrl = "http://114.116.19.246/zabbix/api_jsonrpc.php";
+//    private String zabbixUrl = "http://114.116.19.246/zabbix/api_jsonrpc.php";
+    private String zabbixUrl = "http://124.71.84.163/zabbix/api_jsonrpc.php";
     private ZabbixApi zabbixApi;
 
     public ZabbixApiUtils() {
@@ -262,7 +263,7 @@ public class ZabbixApiUtils {
 
     public static void main(String[] args) {
         ZabbixApiUtils zabbixApiUtils = new ZabbixApiUtils();
-        JSONObject ret = zabbixApiUtils.zabbixLogin("a", "b");
+        JSONObject ret = zabbixApiUtils.zabbixLogin("Admi", "zabbix");
         System.out.print(ret);
     }
 
