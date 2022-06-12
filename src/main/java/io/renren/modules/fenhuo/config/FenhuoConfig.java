@@ -1,5 +1,6 @@
 package io.renren.modules.fenhuo.config;
 
+import io.renren.config.FilePatternConfig;
 import io.renren.config.UploadFileConfig;
 import io.renren.datasource.properties.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,5 +13,10 @@ public class FenhuoConfig {
     @ConfigurationProperties(prefix = "uploadfileconfig")
     public UploadFileConfig uploadFileConfig() {
         return new UploadFileConfig();
+    }
+    @Bean
+    @ConfigurationProperties(prefix = "file-pattern-config")
+    public FilePatternConfig filePatternConfig() {
+        return new FilePatternConfig();
     }
 }

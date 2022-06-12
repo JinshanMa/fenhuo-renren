@@ -13,6 +13,9 @@ uploadfileconfig:
 ##  localuploadpath: /usr/local/fenghuo/renren-running-workdir/fileupload/
   localuploadpath: fileupload
 
+file-pattern-config:
+  userbatchupdate: file-pattern/userbatch-update
+
 spring:
   # 环境 dev|test|prod
   profiles:

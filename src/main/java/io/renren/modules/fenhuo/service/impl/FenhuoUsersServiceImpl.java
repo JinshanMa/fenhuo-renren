@@ -2,6 +2,7 @@ package io.renren.modules.fenhuo.service.impl;
 
 import io.renren.common.exception.RRException;
 import io.renren.common.validator.Assert;
+import io.renren.config.FilePatternConfig;
 import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUserSysRoleEntity;
@@ -47,6 +48,9 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
 
     @Autowired
     private FenhuoUsersService fenhuoUsersService;
+
+    @Autowired
+    private FilePatternConfig filePatternConfig;
 
     @Override
     public FenhuoUsersEntity queryByMobile(String mobile) {
@@ -366,7 +370,8 @@ public class FenhuoUsersServiceImpl extends ServiceImpl<FenhuoUsersDao, FenhuoUs
         ApplicationHome applicationHome = new ApplicationHome(getClass());
         File jarFile = applicationHome.getSource();
         String path = jarFile.getParentFile().toString();
-        path += "/pattern/excel/";
+//        path += "/pattern/excel/";
+        path += "/"+filePatternConfig.getUserbatchupdate()+"/";
 
         String fileName = request.getParameter("fileName");
         String filePath = path + fileName;

@@ -1,6 +1,6 @@
 package io.renren.modules.fenhuo.service.impl;
 
-import com.sun.javafx.collections.MappingChange;
+//import com.sun.javafx.collections.MappingChange;
 import io.renren.modules.fenhuo.entity.FenhuoProjectinfoEntity;
 import io.renren.modules.fenhuo.entity.FenhuoUsersEntity;
 import io.renren.modules.fenhuo.obj.FenhuoProjectinfoRequest;
